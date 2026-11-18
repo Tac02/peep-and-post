@@ -489,6 +489,13 @@
 
   /* ---------------- start ---------------- */
   status(); show(S.active || 'home');
-  try { if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js'); } catch (e) { }
+  try {
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      const hadController = !!navigator.serviceWorker.controller; let reloaded = false;
+      // When a new version takes over, reload once so the new files are used straight away.
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (!hadController || reloaded) return; reloaded = true; clearTimeout(saveT); try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } location.reload(); });
+      navigator.serviceWorker.register('sw.js').then(reg => { reg.update(); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update(); }); });
+    }
+  } catch (e) { }
   PP._test = { get S() { return S; }, compute, cur, show, fromV1 };
 })();
