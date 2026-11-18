@@ -1,6 +1,6 @@
 // Peep & Post service worker: lets the app open with no signal on the range.
 // Bump VERSION whenever you change any app file so phones pick up the update.
-const VERSION = 'pp-v2';
+const VERSION = 'pp-v3';
 const CORE = [
   './',
   './index.html',
