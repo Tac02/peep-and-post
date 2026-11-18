@@ -140,3 +140,5 @@ svg text{font-family:"IBM Plex Sans",sans-serif;font-size:11px;fill:var(--muted)
   .subtabs{gap:4px}.subtab{padding:7px 11px}
   .mbox{padding:10px}
 }
+
+.dirh{margin:2px 0 0;white-space:nowrap;min-height:1em}

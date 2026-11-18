@@ -300,7 +300,7 @@
     if (!R.firings.length) { tb.innerHTML = '<tr><td colspan="15" class="hint" style="padding:10px 6px">No firings yet. Add your first group.</td></tr>'; return; }
     const clicks = isClicks(R), holds = lolliTargets();
     const inp = (f, i, k, cls, type, step, extra) => '<input class="' + cls + '" type="' + type + '"' + (step ? ' step="' + step + '"' : '') + ' data-i="' + i + '" data-f="' + k + '" value="' + esc(f[k]) + '"' + (extra || '') + '>';
-    const pm = (i, k) => '<button type="button" class="pm" data-pm="' + k + '" data-i="' + i + '" title="Flip sign (+/−)" aria-label="Flip sign">±</button>';
+    const pm = (i, k) => { const t = k === 'dx' ? 'Switch between right (+) and left (−)' : k === 'dy' ? 'Switch between up (+) and down (−)' : 'Switch between clicks up (+) and down (−)'; return '<button type="button" class="pm" data-pm="' + k + '" data-i="' + i + '" title="' + t + '" aria-label="' + t + '">±</button>'; };
     const td = (c, l, h) => '<td class="' + c + '" data-label="' + l + '">' + h + '</td>';
     tb.innerHTML = R.firings.map((f, i) => '<tr>' +
       td('c-use', 'Use', '<label class="check" style="font-size:13px"><input type="checkbox" data-i="' + i + '" data-f="inc"' + (f.inc ? ' checked' : '') + '><span class="ph">Use this group</span></label>') +
@@ -312,8 +312,8 @@
       td('c-unit', 'Units', '<select data-i="' + i + '" data-f="unit">' + [['in', 'in'], ['moa', 'MOA'], ['zr', 'ZR card in']].map(o => '<option value="' + o[0] + '"' + ((f.unit || 'in') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>') +
       td('c-aim', 'Aim', '<select data-i="' + i + '" data-f="aim">' + [['poi', 'Point of impact'], ['lolli', 'Lollipop (6 o\'clock)']].map(o => '<option value="' + o[0] + '"' + ((f.aim || 'poi') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>') +
       td('c-tgt', 'Target', '<select data-i="' + i + '" data-id="' + esc(f.id) + '" data-f="tgt"' + (f.aim === 'lolli' ? '' : ' disabled') + '>' + holds.map(t => '<option value="' + t.key + '"' + ((f.tgt || 'f11') === t.key ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') + '</select>') +
-      td('c-dy', 'Up/down (+ high)', '<div class="pmw">' + inp(f, i, 'dy', 'w-m', 'number', '0.25') + pm(i, 'dy') + '</div>') +
-      td('c-dx', 'Left/right (+ right)', '<div class="pmw">' + inp(f, i, 'dx', 'w-m', 'number', '0.25') + pm(i, 'dx') + '</div>') +
+      td('c-dy', 'Up (+) / Down (−)', '<div class="pmw">' + inp(f, i, 'dy', 'w-m', 'number', '0.25', ' placeholder="+ up / − down"') + pm(i, 'dy') + '</div><div class="hint dirh" id="dyh-' + esc(f.id) + '"></div>') +
+      td('c-dx', 'Right (+) / Left (−)', '<div class="pmw">' + inp(f, i, 'dx', 'w-m', 'number', '0.25', ' placeholder="+ right / − left"') + pm(i, 'dx') + '</div><div class="hint dirh" id="dxh-' + esc(f.id) + '"></div>') +
       td('c-grp', 'Group size', inp(f, i, 'group', 'w-s', 'number', '0.25', ' min="0"') + '<div class="hint" id="grp-' + esc(f.id) + '" style="margin:2px 0 0;white-space:nowrap"></div><button type="button" class="small plotbtn" data-plot="' + i + '">' + (f.plot && f.plot.pts && f.plot.pts.length ? 'Edit plot (' + f.plot.pts.length + ')' : 'Plot shots') + '</button>') +
       td('c-notes', 'Notes', inp(f, i, 'notes', '', 'text', '', ' placeholder="Light, wind, position…"')) +
       '<td class="num c-res" data-label="Model / residual" id="res-' + esc(f.id) + '">–</td>' +
@@ -359,6 +359,8 @@
     const R = cur(); if (!R) return;
     const r = compute(R); LAST = r; const T0 = sightDef(R).kind;
     r.pts.concat(r.bpts).forEach(p => { const el = $('res-' + p.f.id); if (el) el.innerHTML = sgn(p.pred) + ' / <b>' + sgn(p.res) + '</b> ' + unitLbl(p.f.unit); });
+    const dir = (v, pos, neg, u) => { const n = num(v); if (n === null) return ''; if (Math.abs(n) < 0.005) return 'centre'; return Math.abs(n) + ' ' + u + ' ' + (n > 0 ? pos : neg); };
+    R.firings.forEach(f => { const ul = unitLbl(f.unit), ey = $('dyh-' + f.id), ex = $('dxh-' + f.id); if (ey) ey.textContent = dir(f.dy, 'high', 'low', ul); if (ex) ex.textContent = dir(f.dx, 'right', 'left', ul); });
     R.firings.forEach(f => {
       const g = $('grp-' + f.id), gv = num(f.group), Rr = num(f.range);
       if (g) g.textContent = (gv && Rr) ? (f.unit === 'moa' ? '= ' + (gv * ipm(Rr)).toFixed(1) + ' in @ ' + Rr : '= ' + (gv / unitIn(f.unit, Rr)).toFixed(1) + ' MOA' + (f.unit === 'zr' ? ' = ' + (gv / unitIn('zr', Rr) * ipm(Rr)).toFixed(1) + ' in @ ' + Rr : '')) : '';
@@ -438,6 +440,7 @@
     const X = v => m.l + v / max * (W - m.l - m.r), Y = v => H - m.b - (v - lo) / (hi - lo) * (H - m.t - m.b);
     let g = '<svg id="trjSvg" viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="max-width:' + W + 'px;display:block;margin-top:10px;touch-action:pan-y" role="img" aria-label="Bullet trajectory relative to line of sight">';
     for (let v = lo; v <= hi + 1e-9; v += stepY) g += '<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--line)"/><text x="' + (m.l - 6) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + (v > 0 ? '+' : '') + v + '</text>';
+    for (let v = 100; v < max; v += 100) g += '<line x1="' + X(v) + '" x2="' + X(v) + '" y1="' + m.t + '" y2="' + (H - m.b) + '" stroke="var(--line)"' + (v % 500 ? '' : ' stroke-width="1.6"') + '/>';
     const xs = (max > 1000 || W < 500) ? 200 : 100; for (let v = 0; v <= max; v += xs) g += '<text x="' + X(v) + '" y="' + (H - m.b + 16) + '" text-anchor="middle">' + v + '</text>';
     g += '<text x="' + ((m.l + W - m.r) / 2) + '" y="' + (H - 4) + '" text-anchor="middle">Range (yd)</text><text transform="translate(12,' + ((m.t + H - m.b) / 2) + ') rotate(-90)" text-anchor="middle">Inches above / below line of sight</text>';
     g += '<line x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + Y(0) + '" y2="' + Y(0) + '" stroke="var(--ink)" stroke-width="1.2" stroke-dasharray="6 4"/>';

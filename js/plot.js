@@ -83,7 +83,7 @@ window.PP = window.PP || {};
     if (s && s.n > 1) { const c = holeR * 1.8; g += '<g stroke="#2d7d46" stroke-width="' + (holeR * 0.35) + '"><line x1="' + (s.cx - c) + '" x2="' + (s.cx + c) + '" y1="' + (-s.cy) + '" y2="' + (-s.cy) + '"/><line x1="' + s.cx + '" x2="' + s.cx + '" y1="' + (-s.cy - c) + '" y2="' + (-s.cy + c) + '"/></g>'; }
     svg.innerHTML = g;
     const u = st.unitPer, lbl = st.unitLabel, fmt = (v, d = 1) => (v >= 0.05 ? '+' : v <= -0.05 ? '−' : '') + Math.abs(v).toFixed(d);
-    $('plotStats').innerHTML = s ? '<div>Shots <b>' + s.n + '</b></div><div>Up/down <b>' + fmt(s.cy * u, 2) + '</b> ' + lbl + '</div><div>Left/right <b>' + fmt(s.cx * u, 2) + '</b> ' + lbl + '</div><div>Group <b>' + (s.es * u).toFixed(2) + '</b> ' + lbl + ' <span class="hint">(' + s.es.toFixed(1) + ' MOA)</span></div>' : '<div class="hint">No shots marked yet.</div>';
+    $('plotStats').innerHTML = s ? '<div>Shots <b>' + s.n + '</b></div><div>Up/down <b>' + fmt(s.cy * u, 2) + '</b> ' + lbl + ' <span class="hint">' + (Math.abs(s.cy * u) < 0.005 ? '' : s.cy > 0 ? 'high' : 'low') + '</span></div><div>Right/left <b>' + fmt(s.cx * u, 2) + '</b> ' + lbl + ' <span class="hint">' + (Math.abs(s.cx * u) < 0.005 ? '' : s.cx > 0 ? 'right' : 'left') + '</span></div><div>Group <b>' + (s.es * u).toFixed(2) + '</b> ' + lbl + ' <span class="hint">(' + s.es.toFixed(1) + ' MOA)</span></div>' : '<div class="hint">No shots marked yet.</div>';
   }
   function toMOA(e) { const svg = $('plotSvg'), pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const p = pt.matrixTransform(svg.getScreenCTM().inverse()); return [p.x, -p.y]; }
   function onTap(e) {
