@@ -1,204 +1,68 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peep &amp; Post</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Peep &amp; Post</title>
 <meta name="description" content="Sight book for classic rifles with iron sights: record test firings and work out sight settings.">
 <meta name="theme-color" content="#5a6b2f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@600&display=swap">
-<style id="css">
-:root{--bg:#f4f1e8;--card:#fffdf7;--ink:#24231f;--muted:#6b675c;--line:#d9d3c2;--accent:#5a6b2f;--accent2:#8a5a1f;--warn:#a3401f;--soft:#ece7d6;--good:#3f6b3a}
-@media (prefers-color-scheme:dark){:root{--bg:#1b1c18;--card:#24251f;--ink:#ebe8dc;--muted:#a19d8f;--line:#3a3b33;--accent:#a3b86a;--accent2:#d6a25e;--warn:#e07a55;--soft:#2e2f28;--good:#8fc285}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "IBM Plex Sans",system-ui,sans-serif}
-.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
-header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:16px}
-h1{font:600 28px/1.1 "IBM Plex Serif",Georgia,serif;margin:0;letter-spacing:.01em}
-h1 small{display:block;font:400 13px "IBM Plex Sans",sans-serif;color:var(--muted);margin-top:4px;letter-spacing:0}
-h2{font:600 17px "IBM Plex Serif",Georgia,serif;margin:0 0 10px}
-.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-#status{font-size:13px;color:var(--muted)}
-#status.dirty{color:var(--accent2);font-weight:600}
-button{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer}
-button:hover{border-color:var(--ink)}
-button.primary{background:var(--accent);color:var(--card);border-color:var(--accent);font-weight:600}
-button.small{padding:3px 8px;font-size:13px}
-button.x{border:none;background:none;color:var(--muted);font-size:18px;padding:0 6px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
-.grid .card{margin-bottom:0}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
-.fields .full{grid-column:1/-1}
-label{display:flex;flex-direction:column;font-size:12px;color:var(--muted);gap:3px}
-label.check{flex-direction:row;align-items:center;gap:6px;font-size:13px;color:var(--ink)}
-input,select,textarea{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:5px 7px;width:100%;min-width:0}
-input[type=checkbox]{width:auto}
-input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
-details summary{cursor:pointer;font-size:13px;color:var(--accent2);margin-top:10px}
-details .fields{margin-top:8px}
-.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
-.scroll{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:13.5px}
-th{text-align:left;font-weight:600;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line);padding:6px 6px;white-space:nowrap}
-td{border-bottom:1px solid var(--line);padding:4px 6px;vertical-align:middle}
-.num,td.num{font-family:"IBM Plex Mono",ui-monospace,monospace;text-align:right;white-space:nowrap}
-#firings input{padding:3px 5px;font-size:13px;background:transparent}
-#firings td{padding:3px 3px}
-#firings .w-s{width:64px}#firings .w-m{width:84px}#firings .w-d{width:130px}
-.set{font:600 16px "IBM Plex Mono",monospace;color:var(--accent)}
-.warnrow td{color:var(--warn)}
-.tag{display:inline-block;font-size:11px;border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:4px}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px}
-.kv div:nth-child(odd){color:var(--muted)}
-.callout{background:var(--soft);border-radius:8px;padding:10px 12px;font-size:14px;margin-top:10px}
-.banner{background:var(--accent2);color:var(--card);border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.banner button{background:var(--card);color:var(--ink)}
-#msg{font-size:13px;color:var(--warn)}
-svg text{font-family:"IBM Plex Sans",sans-serif;font-size:11px;fill:var(--muted)}
-.legend{display:flex;gap:16px;font-size:12px;color:var(--muted);flex-wrap:wrap;margin-top:4px}
-.legend span::before{content:"";display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:5px;background:var(--c)}
-.method p{font-size:13.5px;color:var(--muted);margin:6px 0}
-.pos{color:var(--accent2)}.neg{color:var(--accent)}
-.pmw{display:flex;gap:3px;align-items:center}
-#firings select{width:104px;padding:3px 4px;font-size:13px}
-#firings .c-aim select{width:150px}#firings .c-tgt select{width:130px}
-#firings select:disabled{opacity:.45}
-#firings .c-notes input{min-width:150px}
-.pm{padding:2px 7px;font-size:14px;line-height:1.2;border-radius:5px}
-.phone-only,.ph{display:none}
-#lolli td:first-child,#lolli th:first-child,#settings td:first-child,#settings th:first-child{position:sticky;left:0;background:var(--card);z-index:1}
-@media (max-width:720px){
-  body{font-size:16px}
-  .wrap{padding:12px 10px 100px}
-  header{border-bottom-width:1px;margin-bottom:12px}
-  h1{font-size:22px}
-  #saveBar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));justify-content:space-between;box-shadow:0 -2px 10px rgba(0,0,0,.08)}
-  #saveBar #msg{order:3;flex-basis:100%}
-  #saveBtn{padding:10px 26px;font-size:16px}
-  .card{padding:12px;border-radius:8px}
-  .grid{grid-template-columns:1fr;gap:12px}
-  input,select,textarea{font-size:16px;padding:8px}
-  button{padding:8px 14px}
-  #addBtn{font-size:16px;padding:10px 16px;background:var(--accent);color:var(--card);border-color:var(--accent);font-weight:600}
-  .phone-only{display:inline-block}
-  .ph{display:inline}
-  #firings thead{display:none}
-  #firings,#firings tbody{display:block}
-  #firings tr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 10px;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:12px;background:var(--bg)}
-  #firings td{display:block;border:none;padding:0!important;min-width:0}
-  #firings td[data-label]:not(.c-use)::before{content:attr(data-label);display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
-  #firings input,#firings select{width:100%!important;font-size:16px;padding:8px 6px;background:var(--card)}
-  #firings input[type=checkbox]{width:22px!important;height:22px}
-  #firings .c-use{grid-column:1/3;align-self:center}
-  #firings .c-del{grid-column:3;grid-row:1;justify-self:end}
-  #firings .c-del .x{font-size:15px;border:1px solid var(--line);border-radius:6px;padding:6px 12px;background:var(--card)}
-  #firings .c-date,#firings .c-notes,#firings .c-res{grid-column:1/-1}
-  #firings .c-aim{grid-column:1/3}#firings .c-tgt{grid-column:3/4}
-  #firings .c-res{text-align:left;font-size:14px}
-  #firings .pm{padding:8px 10px;font-size:16px}
-  body:not(.allcols) .col-x{display:none}
-  table{font-size:14px}
-  .set{font-size:15px;white-space:nowrap}
-  body:not(.allcols) .clw{display:none}
-  .phone-note{display:block!important}
-  #settings td,#lolli td{padding:6px 5px}
-}
-@media (max-width:420px){#firings tr{grid-template-columns:1fr 1fr}#firings .c-aim,#firings .c-tgt{grid-column:span 1}#firings .c-del{grid-column:2}#firings .c-use{grid-column:1}}
-
-</style></head>
+<link rel="stylesheet" href="css/app.css">
+</head>
 <body>
-<div id="app"><div class="wrap">
-<header>
-  <h1>Peep &amp; Post<small>Sight book for classic rifles with iron sights. Record test firings and work out your sight settings</small></h1>
-  <div class="bar" id="saveBar"><span id="status">Loading…</span><span id="msg"></span><button id="saveBtn" class="primary">Save</button></div>
-</header>
-<div id="draftBanner" class="banner" hidden>You have unsaved changes from an earlier visit on this device. <button id="restoreBtn">Restore them</button><button id="discardBtn">Discard</button></div>
+<div class="topbar"><div class="wrap">
+  <div class="brandrow">
+    <div class="brand"><img src="icons/icon-192.png" alt=""><div><b>Peep &amp; Post</b><small>Sight book for classic rifles with iron sights</small></div></div>
+    <div class="bar" id="saveBar"><span id="status">Loading…</span><span id="msg"></span></div>
+  </div>
+  <nav class="tabs" id="tabs" aria-label="Rifles"></nav>
+</div></div>
 
-<div class="grid">
+<div class="wrap">
+
+<!-- ================= HOME ================= -->
+<section id="home" class="view">
   <section class="card">
-    <h2>Rifle &amp; sight</h2>
-    <div class="fields">
-      <label class="full">Rifle (name / serial)<input data-k="rifle.name" type="text" placeholder="e.g. No4 Mk1 ROF(F) 1943"></label>
-      <label class="full">Rear sight fitted<select data-k="rifle.sightType" id="sightType">
-        <option value="mk1">Mk1 (Singer type): micrometer screw, 200–1300 yd, clicks</option>
-        <option value="mk2">Mk2: two-aperture flip, 300 &amp; 600 yd</option>
-        <option value="mk3">Mk3: pressed leaf, sprung slide, 200–1300 yd</option>
-        <option value="mk4">Mk4: pressed leaf, improved slide catch, 200–1300 yd</option>
-        <option value="custom">Other / custom graduations</option></select></label>
-      <label class="opt-mk1">Clicks from 200 to 1000 mark<input data-k="rifle.clickCount" type="number" step="1" min="10"></label>
-      <label class="opt-mk1">Clicks available below 200<input data-k="rifle.clicksBelow" type="number" step="1" min="0"></label>
-      <label class="opt-mk34">Slide stops every (yd)<input data-k="rifle.notchStep" type="number" step="50" min="25"></label>
-      <label class="opt-custom full">Graduations you can set<input data-k="rifle.grads" type="text" placeholder="200-1300/50 or 300,600"></label>
-      <label class="check opt-battle"><input data-k="rifle.battle" type="checkbox"> Battle aperture (leaf down)</label>
-      <label class="opt-battle">Battle aperture nominal range (yd)<input data-k="rifle.battleRange" type="number" step="50"></label>
-      <p class="hint full" id="sightHint"></p>
-      <label>Current foresight blade (in)<input data-k="rifle.blade" type="number" step="0.005" placeholder="e.g. 0.045"></label>
-      <label>Foresight blade size step (in)<input data-k="rifle.bladeStep" type="number" step="0.005"></label>
-      <label>Sight height above bore (in)<input data-k="rifle.sightHeight" type="number" step="0.05"></label>
-      <label>Sight radius (in)<input data-k="rifle.sightRadius" type="number" step="0.25"></label>
-      <label class="full">Notes<input data-k="rifle.notes" type="text" placeholder="Bedding, sling, anything that affects zero"></label>
+    <h2>Your rifles</h2>
+    <div id="rifleCards" class="rcards"></div>
+  </section>
+
+  <section class="card" id="addRifle">
+    <h2>Add a rifle</h2>
+    <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <label>Rifle<select id="newModel"></select></label>
+      <label>Rear sight fitted<select id="newSight"></select></label>
+      <label>Name it (serial, nickname…)<input id="newName" type="text" placeholder="e.g. 1943 Maltby"></label>
+      <label>Load<select id="newAmmo" class="ammoSelect"></select></label>
     </div>
-    <p class="hint">Sight radius defaults to a measured No4 figure (720 mm). Sight height is approximate; measure yours. It matters most for short-range and Zero Range firings.</p>
+    <p class="hint" id="newHint"></p>
+    <div class="btnrow"><button id="addRifleBtn" class="primary">Add rifle</button></div>
   </section>
 
   <section class="card">
-    <h2>Ammunition &amp; conditions</h2>
-    <div class="fields">
-      <label class="full">Load preset<select id="ammoPreset"><option value="">Choose to fill in the boxes below…</option></select></label>
-      <label class="full">Load (name / lot)<input data-k="ammo.name" type="text" placeholder="Maker, lot, bullet"></label>
-      <label>Bullet weight (gr)<input data-k="ammo.weight" type="number" step="1"></label>
-      <label>Ballistic coefficient (G1)<input data-k="ammo.bc" type="number" step="0.005"></label>
-      <label>Muzzle velocity (fps)<input data-k="ammo.mv" type="number" step="5"></label>
-      <label class="check"><input data-k="ammo.chrono" type="checkbox"> Velocity measured by chronograph</label>
+    <h2>Conditions</h2>
+    <div class="fields" style="max-width:420px">
       <label>Air temperature (°C)<input data-k="atm.T" type="number" step="1"></label>
       <label>Air pressure at range (hPa)<input data-k="atm.P" type="number" step="1"></label>
     </div>
-    <details><summary>Advanced: what the sight scale was regulated for, and fitting</summary>
-      <div class="fields">
-        <label>Reference bullet (gr)<input data-k="ref.weight" type="number" step="1"></label>
-        <label>Reference BC (G1)<input data-k="ref.bc" type="number" step="0.005"></label>
-        <label>Reference MV (fps)<input data-k="ref.mv" type="number" step="5"></label>
-        <label>Scale fit<select data-k="fit.slope"><option value="auto">Offset + scale (auto, needs 2+ settings 200 yd apart)</option><option value="fixed">Offset only</option></select></label>
-      </div>
-      <p class="hint">The ladder's marks are modelled as the elevation a Mk VII-type service round needs at that range. Your firings then correct that model for your own rifle and load.</p>
-    </details>
-    <p class="hint" id="ammoNote"></p>
-    <p class="hint">Pressure is the actual (station) reading at the range, not the sea-level figure from a forecast. Velocity from the box is usually from a longer test barrel; a chronograph figure is better.</p>
+    <p class="hint">Shared by all your rifles. Use the actual (station) pressure at the range, not the sea-level figure from a forecast.</p>
   </section>
-</div>
 
-<section class="card">
-  <div class="bar" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Test firings</h2><button id="addBtn">+ Add firing</button></div>
-  <div class="scroll"><table id="firings"><thead><tr>
-    <th>Use</th><th>Date</th><th>Range (yd)</th><th>Sight set</th><th title="Clicks up (+) or down (−) from the mark (Mk1)">Clicks ±</th><th>Shots</th><th title="Units for up/down, left/right and group size">Units</th><th title="Where you aimed">Aim</th><th title="Target used for a lollipop hold">Target</th><th title="Height of group centre above aim point. Low is negative.">Up/down</th><th title="Right is positive">Left/right</th><th>Group size</th><th>Notes</th><th class="num">Model / residual</th><th></th></tr></thead><tbody></tbody></table></div>
-  <p class="hint">For each group, enter where its centre landed relative to your point of aim: <b>+</b> is high, <b>−</b> is low. In <i>Sight set</i>, put the mark (<code>300</code>) or <code>B</code> for the battle aperture, and any clicks above or below the mark in <i>Clicks ±</i> (e.g. <code>+2</code> or <code>-3</code>, Mk1 only). Typing <code>500+2</code> straight into Sight set also works. Shots weights each group in the fit. Untick <i>Use</i> to leave out a flyer or a bad day.</p>
-  <p class="hint"><b>Aim:</b> <i>Point of impact</i> means you aimed at the spot you wanted to hit. <i>Lollipop</i> means you held the bottom of the chosen target (or of the round bull's black aiming mark) on top of the foresight. Either way, measure Up/down and Left/right from where you <i>wanted</i> the group to land: the middle of the scoring circles. The tool allows for the hold-off using the target sizes in the Lollipop section. Round-bull faces exist for 200 to 600 yd and long range (900/1000); other ranges are left out.</p>
-  <p class="hint"><b>Units</b> apply to up/down, left/right <i>and group size</i>: <i>in</i> = inches on the target at that range; <i>MOA</i> = minutes of angle; <i>ZR card in</i> = inches measured on the Bisley Zero Range card (fired at 71′ 7″, where ¼ in ≈ 1 MOA). Under each group size the tool shows what it equals in MOA and in inches at the range it represents. For Zero Range groups, put the card mark you aimed at (e.g. 300) as the range and measure from that mark. The card is laid out for a standard trajectory rather than your exact load, so confirm long-range settings on the long range.</p>
-</section>
+  <section class="card">
+    <h2>Ammunition</h2>
+    <p class="hint" style="margin-top:0">Your own loads, available to every rifle. Factory loads are listed underneath; copy one to make a version with your chronographed velocity.</p>
+    <div class="scroll"><table class="ammotbl" id="customAmmo"><thead><tr><th>Name</th><th>Calibre</th><th>Bullet (gr)</th><th>BC (G1)</th><th>MV (fps)</th><th title="Velocity measured by chronograph">Chrono</th><th>Notes</th><th></th></tr></thead><tbody></tbody></table></div>
+    <div class="btnrow"><button id="addAmmoBtn">+ Add custom load</button></div>
+    <details><summary>Factory loads built in</summary>
+      <div class="scroll"><table id="presetAmmo"><thead><tr><th>Load</th><th class="num">Bullet</th><th class="num">BC</th><th class="num">MV</th><th>Notes</th><th></th></tr></thead><tbody></tbody></table></div>
+    </details>
+  </section>
 
-<div class="grid">
-  <section class="card"><h2>Calibration</h2><div id="calib"></div></section>
-  <section class="card"><h2>Foresight</h2>
-    <div class="fields"><label>Range you want the sight to be true at (yd)<input data-k="rifle.zeroRange" type="number" step="50"></label></div>
-    <div id="foresight"></div></section>
-</div>
-
-<section class="card">
-  <div class="bar" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Sight settings</h2>
-    <div class="bar"><label style="flex-direction:row;align-items:center;gap:4px">From<input data-k="table.from" type="number" step="50" style="width:72px"></label><label style="flex-direction:row;align-items:center;gap:4px">to<input data-k="table.to" type="number" step="50" style="width:72px"></label><label style="flex-direction:row;align-items:center;gap:4px">every<input data-k="table.step" type="number" step="25" style="width:64px"></label><button id="copyBtn" class="small">Copy as text</button><button id="moreCols" class="small phone-only">Show all columns</button></div></div>
-  <p class="hint phone-note" style="display:none">On the Mk1, <b>+2</b> / <b>−1</b> after a mark means clicks up or down from it.</p>
-  <div class="scroll"><table id="settings"><thead><tr>
-    <th>Range (yd)</th><th>Set sight to</th><th class="num col-x" id="thClicks">Clicks from 200</th><th class="num">Expected impact</th><th class="num col-x">Exact setting</th><th class="num" id="thBattle">Battle aperture impact</th><th class="num">10 mph crosswind drift</th><th class="num col-x">Velocity (fps)</th><th class="num col-x">Time of flight (s)</th></tr></thead><tbody></tbody></table></div>
-  <p class="hint">Expected impact is where the group centre should land relative to point of aim at that setting (+ high). "Exact setting" is where to set the slide if you can set between marks. Wind drift is for a full-value (right-angle) wind; aim off into the wind.</p>
-  <div id="chart"></div>
-</section>
-
-<section class="card">
-  <div class="bar" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Lollipop settings</h2><button id="copyLolliBtn" class="small">Copy as text</button></div>
-  <p class="hint" style="margin-top:0">Settings for a 6 o'clock hold: the bottom of the target (or of the black aiming mark on a round bull) sits on top of the foresight, and the sight is set so the group centre lands on the middle of the scoring circles. Each cell shows the setting and how far the group centre should land from that middle (+ high). Ranges come from the Sight settings table above.</p>
-  <p class="hint phone-note" style="display:none">+/− after a mark = clicks (Mk1). Swipe the table sideways for more targets.</p>
-  <div class="scroll"><table id="lolli"><thead></thead><tbody></tbody></table></div>
-  <details><summary>Target dimensions used</summary>
+  <section class="card">
+    <h2>Lollipop target sizes</h2>
     <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
       <label>Fig 11 height (mm)<input data-k="lolli.f11h" type="number" step="1"></label>
       <label>Fig 11 circle centre below top (mm)<input data-k="lolli.f11c" type="number" step="1"></label>
@@ -208,413 +72,165 @@ svg text{font-family:"IBM Plex Sans",sans-serif;font-size:11px;fill:var(--muted)
       <label>Fig 12C circle centre below top (mm)<input data-k="lolli.f12cc" type="number" step="1"></label>
       <label>Round bull targets<select data-k="lolli.rb"><option value="nra">NRA TR Round Bull, 2025 on (aiming mark 406 / 560 / 813 / 990 / 1120 mm)</option><option value="hbsa">NRA/HBSA Historic (aiming mark 12 / 18 / 36 in)</option></select></label>
     </div>
-    <p class="hint">From the 2026 NRA Handbook (Bisley Bible), Appendix V: Fig 12C is 400 mm high with its circle centred 200 mm below the top; Fig 12 is the top half of a Fig 11 with its circle centred 300 mm below the top; round-bull aiming marks are 406 mm (200 yd), 560 mm (300), 813 mm (400, not used at Bisley), 990 mm (500/600) and 1120 mm (long range, used here for 900 and 1000). The Fig 11 circle centre (506 mm below the top) is from the NRA CSR Handbook. The Handbook doesn't give the Fig 11 height, so 1140 mm is from MoD range design guidance, and the Fig 12 height (570 mm) is half of that. Change any of these if your targets differ. Historic round bulls only have 200, 300 and 500/600 yd faces.</p>
-  </details>
+    <p class="hint">From the 2026 NRA Handbook (Bisley Bible), Appendix V, and the NRA CSR Handbook. The Fig 11 height (1140 mm) is from MoD range design guidance, and Fig 12 is the top half of a Fig 11. Change any of these if your targets differ.</p>
+  </section>
+
+  <section class="card">
+    <details><summary style="margin-top:0">Backup or move your data</summary>
+      <p class="hint">Everything is saved on this device automatically. Download a backup now and then, or copy the text to move your sight book to another phone. You can also paste a backup from the older No4 Sight Book here: it is added as a new rifle.</p>
+      <textarea id="io" rows="6" style="font-family:'IBM Plex Mono',monospace;font-size:12px;margin-top:8px"></textarea>
+      <div class="btnrow"><button id="exportBtn" class="small">Copy as text</button><button id="importBtn" class="small">Load from text</button><button id="dlBtn" class="small">Download backup file</button>
+        <label class="small" style="flex-direction:row;align-items:center;gap:6px;font-size:13px;color:var(--ink)">Load backup file <input id="ulFile" type="file" accept=".json,application/json" style="width:auto"></label></div>
+    </details>
+  </section>
 </section>
 
-<section class="card">
-  <h2>Trajectory</h2>
-  <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
-    <label>Load<select data-k="trj.a" class="trjAmmo"></select></label>
-    <label>Compare with<select data-k="trj.b" class="trjAmmo" data-none="1"></select></label>
-    <label>Sight set<input data-k="trj.set" type="text" placeholder="300 or B" autocapitalize="characters"></label>
-    <label>Clicks ± (Mk1)<input data-k="trj.clk" type="number" step="1"></label>
-    <label>Show out to (yd)<input data-k="trj.max" type="number" step="100" min="200"></label>
+<!-- ================= RIFLE ================= -->
+<section id="rifle" class="view" hidden>
+  <div class="subtabs" id="subtabs">
+    <button class="subtab" data-p="setup">Rifle &amp; load</button>
+    <button class="subtab" data-p="firings">Test firings</button>
+    <button class="subtab" data-p="settings">Sight settings</button>
+    <button class="subtab" data-p="lolli">Lollipop</button>
+    <button class="subtab" data-p="trj">Trajectory</button>
   </div>
-  <div id="trjInfo" class="hint"></div>
-  <div id="trjPlot" style="touch-action:pan-y"></div>
-  <div class="scroll"><table id="trjTable"><thead></thead><tbody></tbody></table></div>
-  <p class="hint">Height of the bullet above (+) or below (−) your line of sight, in inches, for the sight setting chosen. Tap or hover on the plot to read off any range. The sight's elevation comes from your calibration, so a different load is shown as if fired with the same sight setting on this rifle. Treat comparisons between loads as a guide until you have shot them.</p>
+
+  <!-- setup -->
+  <div class="panel" data-panel="setup">
+    <div class="grid">
+      <section class="card">
+        <h2>Rifle &amp; sight</h2>
+        <div class="fields">
+          <label class="full">Name<input data-k="R.name" type="text"></label>
+          <label class="full">Rifle<select data-k="R.model" id="modelSel"></select></label>
+          <label class="full">Rear sight fitted<select data-k="R.sight" id="sightSel"></select></label>
+          <label class="opt-clicks" id="lblClickCount">Clicks from 200 to top mark<input data-k="R.clickCount" type="number" step="1" min="10"></label>
+          <label class="opt-clicks">Clicks available below 200<input data-k="R.clicksBelow" type="number" step="1" min="0"></label>
+          <label class="opt-steps">Slide stops every (yd)<input data-k="R.notchStep" type="number" step="25" min="25"></label>
+          <label class="opt-custom full">Graduations you can set<input data-k="R.grads" type="text" placeholder="200-1300/50 or 300,600"></label>
+          <label class="check opt-battle"><input data-k="R.battle" type="checkbox"> Battle aperture (leaf down)</label>
+          <label class="opt-battle">Battle aperture nominal range (yd)<input data-k="R.battleRange" type="number" step="50"></label>
+          <p class="hint full" id="sightHint"></p>
+          <label>Current foresight blade (in)<input data-k="R.blade" type="number" step="0.005" placeholder="e.g. 0.045"></label>
+          <label>Foresight blade size step (in)<input data-k="R.bladeStep" type="number" step="0.005"></label>
+          <label>Sight height above bore (in)<input data-k="R.sightHeight" type="number" step="0.05"></label>
+          <label>Sight radius (in)<input data-k="R.sightRadius" type="number" step="0.25"></label>
+          <label class="full">Notes<input data-k="R.notes" type="text" placeholder="Bedding, sling, anything that affects zero"></label>
+        </div>
+        <p class="hint" id="rifleHint"></p>
+      </section>
+      <section class="card">
+        <h2>Load</h2>
+        <div class="fields">
+          <label class="full">Ammunition<select data-k="R.ammoId" class="ammoSelect"></select></label>
+        </div>
+        <div id="ammoInfo" class="kv" style="margin-top:10px"></div>
+        <p class="hint" id="ammoNote"></p>
+        <p class="hint">Add or edit your own loads on the Home tab. Conditions (temperature and pressure) are on the Home tab too.</p>
+        <details><summary>Advanced: what the sight scale was laid out for, and fitting</summary>
+          <div class="fields">
+            <label class="full">Reference load<select id="refPreset"><option value="">Custom…</option></select></label>
+            <label>Reference bullet (gr)<input data-k="R.ref.weight" type="number" step="1"></label>
+            <label>Reference BC (G1)<input data-k="R.ref.bc" type="number" step="0.005"></label>
+            <label>Reference MV (fps)<input data-k="R.ref.mv" type="number" step="5"></label>
+            <label>Scale fit<select data-k="R.fit.slope"><option value="auto">Offset + scale (auto, needs 2+ settings 200 yd apart)</option><option value="fixed">Offset only</option></select></label>
+          </div>
+          <p class="hint">Each sight mark is modelled as the elevation the reference load needs at that range. Your firings then correct that model for your own rifle and load.</p>
+        </details>
+        <div class="btnrow" style="margin-top:16px"><button id="dupRifle" class="small">Duplicate this rifle</button><button id="delRifle" class="small danger">Delete this rifle</button></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- firings -->
+  <div class="panel" data-panel="firings">
+    <section class="card">
+      <div class="bar" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Test firings</h2><button id="addBtn">+ Add firing</button></div>
+      <div class="scroll"><table id="firings"><thead><tr>
+        <th>Use</th><th>Date</th><th>Range (yd)</th><th>Sight set</th><th title="Clicks up (+) or down (−) from the mark">Clicks ±</th><th>Shots</th><th title="Units for up/down, left/right and group size">Units</th><th title="Where you aimed">Aim</th><th title="Target used for a lollipop hold">Target</th><th title="Height of group centre above where you wanted it. Low is negative.">Up/down</th><th title="Right is positive">Left/right</th><th>Group size</th><th>Notes</th><th class="num">Model / residual</th><th></th></tr></thead><tbody></tbody></table></div>
+      <p class="hint">For each group, enter where its centre landed relative to where you <i>wanted</i> it: <b>+</b> is high, <b>−</b> is low. Or tap <b>Plot shots</b> and mark each hole on a picture of the target; the tool fills in the centre, size and shot count. In <i>Sight set</i>, put the mark or setting (e.g. <code>300</code> or <code>525</code>) or <code>B</code> for the battle aperture, and any micrometer clicks in <i>Clicks ±</i>. Untick <i>Use</i> to leave out a flyer or a bad day.</p>
+      <p class="hint"><b>Aim:</b> <i>Point of impact</i> means you aimed at the spot you wanted to hit. <i>Lollipop</i> means you held the bottom of the chosen target (or of the round bull's black aiming mark) on top of the foresight. Either way, measure from the middle of the scoring circles; the tool allows for the hold-off.</p>
+      <p class="hint"><b>Units</b> apply to up/down, left/right and group size: <i>in</i> = inches at that range; <i>MOA</i>; <i>ZR card in</i> = inches on the Bisley Zero Range card (fired at 71′ 7″, where ¼ in ≈ 1 MOA). For Zero Range groups, put the card mark you aimed at (e.g. 300) as the range.</p>
+    </section>
+    <div class="grid">
+      <section class="card"><h2>Calibration</h2><div id="calib"></div></section>
+      <section class="card"><h2>Foresight</h2>
+        <div class="fields"><label>Range you want the sight to be true at (yd)<input data-k="R.zeroRange" type="number" step="50"></label></div>
+        <div id="foresight"></div></section>
+    </div>
+  </div>
+
+  <!-- settings -->
+  <div class="panel" data-panel="settings">
+    <section class="card">
+      <div class="bar" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Sight settings</h2>
+        <div class="bar"><label style="flex-direction:row;align-items:center;gap:4px">From<input data-k="R.table.from" type="number" step="50" style="width:72px"></label><label style="flex-direction:row;align-items:center;gap:4px">to<input data-k="R.table.to" type="number" step="50" style="width:72px"></label><label style="flex-direction:row;align-items:center;gap:4px">every<input data-k="R.table.step" type="number" step="25" style="width:64px"></label><button id="copyBtn" class="small">Copy as text</button><button id="moreCols" class="small phone-only">Show all columns</button></div></div>
+      <p class="hint phone-note" style="display:none">On a micrometer sight, <b>+2</b> / <b>−1</b> after a mark means clicks up or down from it.</p>
+      <div class="scroll"><table id="settings"><thead><tr>
+        <th>Range (yd)</th><th>Set sight to</th><th class="num col-x" id="thClicks">Clicks from 200</th><th class="num">Expected impact</th><th class="num col-x">Exact setting</th><th class="num" id="thBattle">Battle aperture impact</th><th class="num">10 mph crosswind drift</th><th class="num col-x">Velocity (fps)</th><th class="num col-x">Time of flight (s)</th></tr></thead><tbody></tbody></table></div>
+      <p class="hint">Expected impact is where the group centre should land relative to point of aim at that setting (+ high). "Exact setting" is where to set the slide if you could set it anywhere. Wind drift is for a full-value (right-angle) wind; aim off into the wind. Rows in orange are near the speed of sound and less certain.</p>
+      <div id="chart"></div>
+    </section>
+  </div>
+
+  <!-- lollipop -->
+  <div class="panel" data-panel="lolli">
+    <section class="card">
+      <div class="bar" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Lollipop settings</h2><button id="copyLolliBtn" class="small">Copy as text</button></div>
+      <p class="hint" style="margin-top:0">Settings for a 6 o'clock hold: the bottom of the target (or of the black aiming mark on a round bull) sits on top of the foresight, and the sight is set so the group centre lands on the middle of the scoring circles. Each cell shows the setting and how far the group should land from that middle (+ high). Target sizes are on the Home tab.</p>
+      <p class="hint phone-note" style="display:none">+/− after a mark = clicks. Swipe the table sideways for more targets.</p>
+      <div class="scroll"><table id="lolli"><thead></thead><tbody></tbody></table></div>
+    </section>
+  </div>
+
+  <!-- trajectory -->
+  <div class="panel" data-panel="trj">
+    <section class="card">
+      <h2>Trajectory</h2>
+      <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+        <label>Load<select data-k="R.trj.a" class="ammoSelect" data-current="1"></select></label>
+        <label>Compare with<select data-k="R.trj.b" class="ammoSelect" data-current="1" data-none="1"></select></label>
+        <label>Sight set<input data-k="R.trj.set" type="text" placeholder="300 or B" autocapitalize="characters"></label>
+        <label class="opt-clicks">Clicks ±<input data-k="R.trj.clk" type="number" step="1"></label>
+        <label>Show out to (yd)<input data-k="R.trj.max" type="number" step="100" min="200"></label>
+      </div>
+      <div id="trjInfo" class="hint"></div>
+      <div id="trjPlot" style="touch-action:pan-y"></div>
+      <div class="scroll"><table id="trjTable"><thead></thead><tbody></tbody></table></div>
+      <p class="hint">Height of the bullet above (+) or below (−) your line of sight, in inches, for the sight setting chosen. Tap or hover on the plot to read off any range. A different load is shown as if fired with the same sight setting on this rifle; treat comparisons as a guide until you have shot them.</p>
+    </section>
+  </div>
+
+  <section class="card method"><h2>How it works</h2>
+    <p>A point-mass trajectory (G1 drag, your temperature and pressure) gives the elevation your load needs at every range. Each sight mark is treated as the elevation the reference load needs at that distance, which is how service sights were laid out.</p>
+    <p>Each test group tells the tool how much elevation that setting actually gave on your rifle. With groups at one setting it fits a fixed offset (in effect, foresight height). With groups at two or more settings 200+ yards apart it also fits a scale factor, which absorbs differences from the reference load. Residuals show how well the model explains each group; large ones point to a flyer, a typo or changed conditions.</p>
+    <p>Treat predictions beyond your furthest test range as a starting point and confirm on paper.</p>
+  </section>
 </section>
 
-<section class="card">
-  <details><summary style="margin-top:0">Backup or move your data</summary>
-    <p class="hint">Copy the text below somewhere safe, or paste text from another copy and load it.</p>
-    <textarea id="io" rows="6" style="font-family:'IBM Plex Mono',monospace;font-size:12px;margin-top:8px"></textarea>
-    <div class="bar" style="margin-top:8px"><button id="exportBtn" class="small">Refresh &amp; copy</button><button id="importBtn" class="small">Load from text</button><button id="dlBtn" class="small standalone" style="display:none">Download backup file</button><label class="small standalone" style="display:none;flex-direction:row;align-items:center;gap:6px;font-size:13px;color:var(--ink)">Load backup file <input id="ulFile" type="file" accept=".json,application/json" style="width:auto"></label></div>
-  </details>
-</section>
+</div>
 
-<section class="card method"><h2>How it works</h2>
-  <p>A point-mass trajectory (G1 drag, your temperature and pressure) gives the elevation your load needs at every range. Each ladder mark is treated as the elevation a Mk VII-type round needs at that distance, which is how the scale was laid out.</p>
-  <p>Each test group tells the tool how much elevation that setting actually gave on your rifle: the elevation needed plus how high the group was. With groups at one setting it fits a fixed offset (in effect, foresight height). With groups at two or more settings 200+ yards apart it also fits a scale factor, which absorbs differences in velocity and BC from the reference round. Residuals show how well the model explains each group; large ones point to a flyer, a typo or changed conditions.</p>
-  <p>Treat predictions beyond your furthest test range as a starting point and confirm on paper. Rows in orange are where the bullet is near the speed of sound and drops off quickly, so they are less certain.</p>
-</section>
-</div></div>
-<script type="application/json" id="state">{}</script>
-<script id="main">
-(function(){
-"use strict";
-const PAGE={css:document.getElementById('css').outerHTML,app:document.getElementById('app').outerHTML,main:document.getElementById('main').outerHTML};
-const FONT='<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@600&display=swap">';
-const DEFAULTS={
-  rifle:{name:"",sightType:"mk1",clickCount:56,clicksBelow:4,notchStep:100,grads:"200-1300/100",battle:true,battleRange:300,sightHeight:1.0,sightRadius:28.35,blade:null,bladeStep:0.015,zeroRange:300,notes:""},
-  ammo:{name:"Mk VII-type ball",weight:174,bc:0.41,mv:2440,chrono:false},
-  ref:{weight:174,bc:0.41,mv:2440},
-  atm:{T:15,P:1013},
-  fit:{slope:"auto"},
-  table:{from:100,to:1000,step:100},
-  trj:{a:"current",b:"",set:"300",clk:0,max:1000},
-  lolli:{f11h:1140,f11c:506,f12h:570,f12c:300,f12ch:400,f12cc:200,rb:"nra",aim:"bottom"},
-  firings:[],savedAt:null};
-function merge(d,s){const o=JSON.parse(JSON.stringify(d));if(!s||typeof s!=='object')return o;for(const k in s){if(o[k]&&typeof o[k]==='object'&&!Array.isArray(o[k])&&s[k]&&typeof s[k]==='object'&&!Array.isArray(s[k]))Object.assign(o[k],s[k]);else o[k]=s[k];}return o;}
-let savedRaw={};try{savedRaw=JSON.parse(document.getElementById('state').textContent||'{}')||{};}catch(e){savedRaw={};}
-let S=merge(DEFAULTS,savedRaw);
-let dirty=false,ART=null,artTried=false;
-const $=id=>document.getElementById(id);
-const num=v=>(v===null||v===undefined||v===''||isNaN(+v))?null:+v;
+<!-- shot plotting -->
+<div class="modal" id="plotModal" hidden role="dialog" aria-modal="true" aria-labelledby="plotTitle">
+  <div class="mbox">
+    <h2 id="plotTitle">Plot shots</h2>
+    <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:8px">
+      <label>Target<select id="plotFace"></select></label>
+      <label>Range it represents (yd)<input id="plotRange" type="number" step="25" disabled></label>
+    </div>
+    <svg id="plotSvg" viewBox="-10 -10 20 20" role="img" aria-label="Target: tap to mark each shot"></svg>
+    <div class="plotstats" id="plotStats"></div>
+    <p class="hint" style="margin:0 0 8px">Tap where each shot landed; use Undo to take the last one off. Zoom in for tight groups. Measurements are from the middle of the scoring circles.</p>
+    <div class="btnrow" style="justify-content:space-between">
+      <div class="bar"><button id="plotUndo" class="small">Undo</button><button id="plotClear" class="small">Clear</button><button id="plotZoomIn" class="small" aria-label="Zoom in">＋</button><button id="plotZoomOut" class="small" aria-label="Zoom out">－</button></div>
+      <div class="bar"><button id="plotCancel">Cancel</button><button id="plotApply" class="primary">Use these shots</button></div>
+    </div>
+  </div>
+</div>
 
-/* ---------- ballistics ---------- */
-const G1M=[0,.05,.1,.15,.2,.25,.3,.35,.4,.45,.5,.55,.6,.7,.725,.75,.775,.8,.825,.85,.875,.9,.925,.95,.975,1,1.025,1.05,1.075,1.1,1.125,1.15,1.2,1.25,1.3,1.35,1.4,1.45,1.5,1.55,1.6,1.65,1.7,1.75,1.8,1.85,1.9,1.95,2,2.05,2.1,2.15,2.2,2.25,2.3,2.35,2.4,2.45,2.5,2.6,2.7,2.8,2.9,3];
-const G1C=[.2629,.2558,.2487,.2413,.2344,.2278,.2214,.2155,.2104,.2061,.2032,.202,.2034,.2165,.223,.2313,.2417,.2546,.2706,.2901,.3136,.3415,.3734,.4084,.4448,.4805,.5136,.5427,.5677,.5883,.6053,.6191,.6393,.6518,.6589,.6621,.6625,.6607,.6573,.6528,.6474,.6413,.6347,.628,.621,.6141,.6072,.6003,.5934,.5867,.5804,.5743,.5685,.563,.5577,.5527,.5481,.5438,.5397,.5325,.5264,.5211,.5168,.5133];
-function g1(m){if(m<=0)return G1C[0];if(m>=3)return G1C[G1C.length-1];let i=1;while(G1M[i]<m)i++;const f=(m-G1M[i-1])/(G1M[i]-G1M[i-1]);return G1C[i-1]+f*(G1C[i]-G1C[i-1]);}
-const MOA=3437.7468,YD=0.9144,MAXYD=2600;
-const ipm=R=>R*36/MOA; // inches per MOA at R yards
-function traj(am,atm){
-  const bc=Math.max(0.05,num(am.bc)||0.4)*703.07,v0=Math.max(300,num(am.mv)||2400)*0.3048;
-  const T=num(atm.T)??15,P=num(atm.P)??1013;
-  const rho=(P*100)/(287.05*(T+273.15)),c=331.3*Math.sqrt(1+T/273.15);
-  const N=MAXYD+1,y=new Float64Array(N),t=new Float64Array(N),v=new Float64Array(N);
-  let X=0,Y=0,VX=v0,VY=0,TT=0,next=1;const dt=0.0005;v[0]=v0;
-  const acc=(vx,vy)=>{const s=Math.hypot(vx,vy),k=rho*g1(s/c)*Math.PI/(8*bc);return[-k*s*vx,-k*s*vy-9.80665];};
-  while(next<N&&TT<20){
-    const a1=acc(VX,VY),mx=VX+a1[0]*dt/2,my=VY+a1[1]*dt/2,a2=acc(mx,my);
-    const nX=X+mx*dt,nY=Y+my*dt,nVX=VX+a2[0]*dt,nVY=VY+a2[1]*dt;
-    while(next<N&&nX>=next*YD){const f=(next*YD-X)/(nX-X);y[next]=Y+f*(nY-Y);t[next]=TT+f*dt;v[next]=Math.hypot(VX+f*(nVX-VX),VY+f*(nVY-VY));next++;}
-    X=nX;Y=nY;VX=nVX;VY=nVY;TT+=dt;if(VX<30)break;}
-  return{y,t,v,v0,c,reach:next-1};
-}
-function lerpArr(a,R){const i=Math.floor(R),f=R-i;return i+1<a.length?a[i]+f*(a[i+1]-a[i]):a[i];}
-function angleAt(tr,R){if(!(R>=1)||R>tr.reach)return NaN;const h=(num(S.rifle.sightHeight)??1)*0.0254;return(h-lerpArr(tr.y,R))/(R*YD)*MOA;}
-
-/* ---------- graduations ---------- */
-function parseGrads(s){const out=[];String(s||'').split(/[,;\s]+/).forEach(tok=>{if(!tok)return;const m=tok.match(/^(\d+)-(\d+)(?:\/(\d+))?$/);if(m){let a=+m[1],b=+m[2],st=+(m[3]||100);if(st<=0)st=100;for(let x=a;x<=b+1e-9&&out.length<500;x+=st)out.push(x);}else if(isFinite(+tok)&&tok!=='')out.push(+tok);});return[...new Set(out)].filter(x=>x>=100&&x<=2500).sort((a,b)=>a-b);}
-
-const AMMO=[
- {id:"mk7",name:"Mk VII-type service ball, 174 gr FMJ",weight:174,bc:0.41,mv:2440,note:"Nominal figures for the service round the sight scale was laid out for. The BC is an estimate; surplus lots vary."},
- {id:"ppu174",name:"PPU 174 gr FMJBT (PP303F)",weight:174,bc:0.478,mv:2400,note:"PPU published: 2400 fps, G1 0.478. Some retailers list 2460 fps. Box velocity comes from a test barrel, so a chronograph figure from your rifle is better."},
- {id:"ppu180",name:"PPU 180 gr SPBT (PP303S2)",weight:180,bc:0.512,mv:2460,note:"PPU published: 2460 fps, G1 0.512."},
- {id:"ppu150",name:"PPU 150 gr SPBT (PP303S1)",weight:150,bc:0.385,mv:2690,note:"PPU published: 2690 fps, G1 0.385."},
- {id:"sb180fmj",name:"S&B 180 gr FMJ (SB303A)",weight:180,bc:0.506,mv:2477,note:"S&B published: 2477 fps (from a 23.5 in test barrel), G1 0.506."},
- {id:"sb180sp",name:"S&B 180 gr SP (SB303C)",weight:180,bc:0.30,mv:2438,note:"S&B published 2438 fps. Retailers often list BC 0.505, but S&B's own drop table for this load matches about G1 0.30, so that is used here. Refine it from your firings."}];
-const SIGHTS={
- mk1:{hint:"Mk1: the slide is wound by the knurled screw in clicks of roughly 1 MOA (about 1 in at 100 yd). Count the clicks between the 200 and 1000 marks on your own sight (typically about 56) so the tool knows your click value. Settings are shown as a 100-yd mark plus or minus clicks.",battle:true},
- mk2:{hint:"Mk2: wartime flip sight with 300 and 600 yd apertures only. Armourers zeroed these on the 300 aperture with the bayonet fixed, so expect a small change in impact with the bayonet on or off.",battle:false},
- mk3:{hint:"Mk3: pressed-steel leaf with a sprung slide that locks in notches; no clicks. Set how often the slide stops on yours. Ranges between stops are shown as aim-off.",battle:true},
- mk4:{hint:"Mk4: as the Mk3 but with the improved, curved slide catch and larger aperture; no clicks. Set how often the slide stops on yours.",battle:true},
- custom:{hint:"Custom: list the settings you can use, e.g. 200-1300/50 (200 to 1300 in 50s) or 300,600.",battle:true}};
-const ZRYD=71.5833/3; // Bisley Zero Range, 71 ft 7 in
-const st=()=>SIGHTS[S.rifle.sightType]?S.rifle.sightType:'mk1';
-const hasBattle=()=>SIGHTS[st()].battle&&!!S.rifle.battle;
-function parseSetting(v){const t=String(v??'').trim().toUpperCase().replace(/\s+/g,'').replace('\u2212','-');if(!t)return null;if(t==='B'||t==='BATTLE')return{battle:true};
-  const m=t.match(/^(\d+(?:\.\d+)?)(?:([+-])(\d+(?:\.\d+)?)(?:C|CL|CLICKS?)?)?$/);if(!m)return null;return{mark:+m[1],clicks:m[2]?(m[2]==='-'?-1:1)*+m[3]:0};}
-const unitIn=(u,R)=>u==='moa'?1:u==='zr'?ipm(ZRYD):ipm(R); // display units per MOA
-const unitLbl=u=>u==='moa'?'MOA':u==='zr'?'in (card)':'in';
-
-const RB={nra:{name:"NRA TR Round Bull",am:{200:406/25.4,300:560/25.4,400:813/25.4,500:990/25.4,600:990/25.4,900:1120/25.4,1000:1120/25.4}},hbsa:{name:"NRA/HBSA Historic",am:{200:12,300:18,500:36,600:36}}};
-function lolliTargets(){const L=S.lolli,mm=v=>(num(v)??0)/25.4;
-  const fig=(key,name,h,c)=>({key,name,hold:mm(h)-mm(c),holdAt(){const x=mm(h)-mm(c);return x>0?x:null;}});
-  const rb=RB[L.rb]||RB.nra;
-  return[fig('f11','Figure 11',L.f11h,L.f11c),fig('f12','Figure 12',L.f12h,L.f12c),fig('f12c','Figure 12C',L.f12ch,L.f12cc),
-    {key:'rb',name:rb.name,holdAt(R){const am=rb.am[R];return am?am/2:null;},rb}];}
-
-/* ---------- main computation ---------- */
-function compute(){
-  const ref=traj(S.ref,{T:15,P:1013.25}),usr=traj(S.ammo,S.atm);
-  const nomArr=new Float64Array(2501);for(let s=1;s<=2500;s++)nomArr[s]=angleAt(ref,s);
-  const nomAt=s=>(s>=1&&s<=2500)?lerpArr(nomArr,s):NaN;
-  const invNom=t=>{if(!(t>=nomArr[100])){const sl=(nomArr[150]-nomArr[100])/50;const x=100+(t-nomArr[100])/sl;return(isFinite(x)&&x>=50)?x:-1;}if(t>nomArr[2500]||isNaN(nomArr[2500]))return Infinity;let lo=100,hi=2500;while(hi-lo>1){const m=(lo+hi)>>1;if(nomArr[m]<t)lo=m;else hi=m;}return lo+(t-nomArr[lo])/(nomArr[hi]-nomArr[lo]);};
-  const U=(nomAt(1000)-nomAt(200))/Math.max(10,num(S.rifle.clickCount)||56); // MOA per click in scale terms
-  const holds=lolliTargets();const skipped={};
-  const pts=[],bpts=[];
-  S.firings.forEach(f=>{const R=num(f.range),dy=num(f.dy);if(!f.inc||!R||dy===null)return;let need=angleAt(usr,R);if(isNaN(need))return;
-    let holdM=0;if(f.aim==='lolli'){const t=holds.find(x=>x.key===(f.tgt||'f11'));const hh=t&&t.holdAt(R);if(!hh){skipped[f.id]='No '+(t?t.name:'target')+' face for '+R+' yd';return;}holdM=hh/ipm(R);}
-    const need0=need;need=need0+holdM;
-    const uf=unitIn(f.unit,R),dyM=dy/uf,w=Math.max(0.1,num(f.shots)||1),act=need+dyM,ps=parseSetting(f.setting);if(!ps)return;if(!ps.battle)ps.clicks+=num(f.clk)||0;
-    if(ps.battle){bpts.push({f,R,w,need,need0,holdM,act,dyM,uf});return;}
-    const x0=nomAt(ps.mark);if(isNaN(x0))return;const x=x0+ps.clicks*U;pts.push({f,R,w,need,need0,holdM,act,x,s:ps.mark,dyM,uf});});
-  let a=0,b=1,mode='none',note='';
-  const settingsUsed=[...new Set(pts.map(p=>p.s))];const span=settingsUsed.length?Math.max(...settingsUsed)-Math.min(...settingsUsed):0;
-  if(pts.length){
-    if(S.fit.slope!=='fixed'&&settingsUsed.length>=2&&span>=200){
-      let sw=0,sx=0,sy=0,sxx=0,sxy=0;pts.forEach(p=>{sw+=p.w;sx+=p.w*p.x;sy+=p.w*p.act;sxx+=p.w*p.x*p.x;sxy+=p.w*p.x*p.act;});
-      const d=sw*sxx-sx*sx;const bb=d?(sw*sxy-sx*sy)/d:1;
-      if(bb>0.6&&bb<1.6){b=bb;a=(sy-b*sx)/sw;mode='scale';}
-      else{note='The scale fit came out implausible ('+bb.toFixed(2)+'), so only an offset was fitted. Check for typos or a bad group.';}
-    }
-    if(mode!=='scale'){let sw=0,s=0;pts.forEach(p=>{sw+=p.w;s+=p.w*(p.act-p.x);});a=s/sw;b=1;mode='offset';}
-  }
-  const bR=num(S.rifle.battleRange)||300;
-  let battleAngle,battleFrom;
-  if(bpts.length){let sw=0,s=0;bpts.forEach(p=>{sw+=p.w;s+=p.w*p.act;});battleAngle=s/sw;battleFrom='measured';
-    if(!pts.length){a=battleAngle-nomAt(bR);b=1;mode='battle';}}
-  else{battleAngle=a+b*nomAt(bR);battleFrom='assumed';}
-  // residuals
-  let rw=0,rs=0;
-  pts.forEach(p=>{const pm=a+b*p.x-p.need,rm=p.dyM-pm;p.pred=pm*p.uf;p.res=rm*p.uf;rw+=p.w;rs+=p.w*rm*rm;});
-  bpts.forEach(p=>{const pm=battleAngle-p.need,rm=p.dyM-pm;p.pred=pm*p.uf;p.res=rm*p.uf;if(bpts.length>1||pts.length){rw+=p.w;rs+=p.w*rm*rm;}});
-  const rms=rw?Math.sqrt(rs/rw):null;
-  // table
-  const T=st();
-  const grads=T==='mk2'?[300,600]:(T==='mk3'||T==='mk4')?parseGrads('200-1300/'+Math.max(25,num(S.rifle.notchStep)||100)):T==='custom'?parseGrads(S.rifle.grads):[];
-  const marks=[];for(let m=200;m<=1300;m+=100)marks.push(m);
-  const below=Math.max(0,num(S.rifle.clicksBelow)??4),c200=nomAt(200),maxClicks=Math.round((nomAt(1300)-c200)/U);
-  let from=Math.max(50,num(S.table.from)||100),to=Math.min(2500,num(S.table.to)||1000),step=Math.max(10,num(S.table.step)||100);if(to<from)to=from;
-  // pick the setting whose elevation is closest to 'want' (MOA); poi = impact vs point of aim (in)
-  const choose=(want,need,R)=>{let best=null;
-    if(T==='mk1'){const xs=(want-a)/b;
-      marks.forEach(m=>{let n=Math.round((xs-nomAt(m))/U);let tot=Math.round((nomAt(m)-c200)/U)+n;
-        if(tot<-below){n+=(-below-tot);tot=-below;} if(tot>maxClicks){n-=(tot-maxClicks);tot=maxClicks;}
-        const x=nomAt(m)+n*U,err=Math.abs(xs-x);
-        if(!best||Math.abs(n)<Math.abs(best.n)||(Math.abs(n)===Math.abs(best.n)&&err<best.err))best={err,n,m,tot,poi:(a+b*x-need)*ipm(R),off:(a+b*x-want)*ipm(R)};});
-      if(best)best.label=best.m+(best.n?(best.n>0?' +':' \u2212')+Math.abs(best.n)+(Math.abs(best.n)===1?' click':' clicks'):'');}
-    else grads.forEach(g=>{const x=a+b*nomAt(g),off=(x-want)*ipm(R);if(!best||Math.abs(off)<Math.abs(best.off))best={g,poi:(x-need)*ipm(R),off,label:String(g)};});
-    return best;};
-  const rows=[];
-  for(let R=from;R<=to+1e-9&&rows.length<200;R+=step){
-    const need=angleAt(usr,R);if(isNaN(need))continue;
-    const exact=invNom((need-a)/b);
-    const best=choose(need,need,R);
-    const tof=lerpArr(usr.t,R),vel=lerpArr(usr.v,R);
-    const drift=4.4704*(tof-R*YD/usr.v0)/0.0254;
-    const lolli=holds.map(t=>{const h=t.holdAt(R);if(h===null)return null;const c=choose(need+h/ipm(R),need,R);return c?{hold:h,c}:null;});
-    rows.push({R,need,exact,best,lolli,battle:hasBattle()?(battleAngle-need)*ipm(R):null,drift,vel:vel/0.3048,tof,trans:vel<usr.c*1.12});
-  }
-  // foresight
-  const Z=num(S.rifle.zeroRange)||300;let fs=null;
-  if(pts.length||bpts.length){const needZ=angleAt(usr,Z);const useB=!pts.length;const giv=useB?battleAngle:a+b*nomAt(Z);
-    if(!isNaN(needZ)&&!isNaN(giv)){const E=giv-needZ;const rad=num(S.rifle.sightRadius)||28;const dh=E/MOA*rad;const st=num(S.rifle.bladeStep)||0.015;fs={Z,E,poi:E*ipm(Z),dh,steps:Math.round(dh/st),st,useB};}}
-  // implied settings for chart
-  const implied=pts.map(p=>({R:p.R,s:invNom(p.x+(p.need0-(p.act-p.holdM))/b)})).filter(p=>isFinite(p.s)&&p.s>0);
-  const grp=S.firings.filter(f=>f.inc&&num(f.group)&&num(f.range)).map(f=>num(f.group)/unitIn(f.unit,num(f.range)));
-  return{skipped,nomAt,grpMOA:grp.length?grp.reduce((x,y)=>x+y,0)/grp.length:null,nGrp:grp.length,holds,U,a,b,mode,note,pts,bpts,battleAngle,battleFrom,bR,rms,rows,grads,fs,implied,usr,maxR:Math.max(0,...pts.map(p=>p.R),...bpts.map(p=>p.R))};
-}
-
-/* ---------- formatting ---------- */
-const sgn=(n,d=1)=>n===null||isNaN(n)?'–':(n>=0.05||n<=-0.05?(n>0?'+':'−'):'')+Math.abs(n).toFixed(d);
-const hiLo=n=>n>=0.05?'high':n<=-0.05?'low':'';
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const lab=t=>esc(t).replace(/ (clicks?)$/,'<span class="clw"> $1</span>');
-function fmtExact(x){if(x===-1)return'below 100';if(x===Infinity)return'off scale';return String(Math.round(x/5)*5);}
-
-/* ---------- render ---------- */
-let LAST=null;
-function recompute(){
-  const r=compute();LAST=r;
-  // firing residuals
-  r.pts.concat(r.bpts).forEach(p=>{const el=$('res-'+p.f.id);if(el)el.innerHTML=sgn(p.pred)+' / <b>'+sgn(p.res)+'</b> '+unitLbl(p.f.unit);});
-  S.firings.forEach(f=>{const g=$('grp-'+f.id),gv=num(f.group),R=num(f.range);if(g)g.textContent=(gv&&R)?(f.unit==='moa'?'= '+(gv*ipm(R)).toFixed(1)+' in @ '+R:'= '+(gv/unitIn(f.unit,R)).toFixed(1)+' MOA'+(f.unit==='zr'?' = '+(gv/unitIn('zr',R)*ipm(R)).toFixed(1)+' in @ '+R:'')):'';});
-  S.firings.forEach(f=>{if(![...r.pts,...r.bpts].some(p=>p.f===f)){const el=$('res-'+f.id);if(el)el.textContent=r.skipped[f.id]||'–';}
-    const ts=document.querySelector('#firings [data-f="tgt"][data-id="'+f.id+'"]');if(ts)ts.disabled=f.aim!=='lolli';});
-  // calibration
-  let h='';const T0=st();
-  if(r.mode==='none'){h='<p>No test firings yet. Settings below are predicted from your load\'s ballistics against a standard Mk VII-regulated scale, with no correction for your rifle.</p>';}
-  else{
-    const n=r.pts.length+r.bpts.length,shots=[...r.pts,...r.bpts].reduce((s,p)=>s+(num(p.f.shots)||0),0);
-    h+='<div class="kv">';
-    h+='<div>Groups used</div><div>'+n+(shots?' ('+shots+' shots)':'')+'</div>';
-    h+='<div>Elevation offset</div><div><span class="num">'+sgn(r.a,2)+'</span> MOA '+(r.a>=0?'(sight gives more elevation than standard)':'(sight gives less elevation than standard)')+'</div>';
-    h+='<div>Scale factor</div><div><span class="num">'+r.b.toFixed(3)+'</span> '+(r.mode==='scale'?'(fitted)':'(fixed at 1, needs groups at 2+ settings 200 yd apart)')+'</div>';
-    if(T0==='mk1')h+='<div>Click value</div><div><span class="num">'+(r.U*r.b).toFixed(2)+'</span> MOA ≈ '+(r.U*r.b*1.047).toFixed(2)+' in at 100 yd</div>';
-    if(hasBattle())h+='<div>Battle aperture</div><div>'+(r.battleFrom==='measured'?'measured from your groups':'assumed to match the '+r.bR+' mark')+'</div>';
-    if(r.grpMOA!==null)h+='<div>Average group</div><div><span class="num">'+r.grpMOA.toFixed(1)+'</span> MOA ('+r.nGrp+' group'+(r.nGrp>1?'s':'')+')</div>';
-    if(r.rms!==null)h+='<div>Fit residual (RMS)</div><div><span class="num">'+r.rms.toFixed(2)+'</span> MOA'+(r.rms<1?' (good)':r.rms<2?' (fair)':' (poor, check for flyers or typos)')+'</div>';
-    h+='</div>';
-    if(r.mode==='battle')h+='<div class="callout">Only battle-aperture groups so far; the ladder is assumed to match it at '+r.bR+'. Shoot some ladder groups to calibrate the scale properly.</div>';
-    if(r.note)h+='<div class="callout">'+esc(r.note)+'</div>';
-    if(r.maxR&&num(S.table.to)>r.maxR+150)h+='<p class="hint">Your furthest test group is at '+r.maxR+' yd. Rows beyond that are extrapolated.</p>';
-  }
-  $('calib').innerHTML=h;
-  // foresight
-  let fh='';
-  if(!r.fs)fh='<p class="hint">Add test firings to get foresight advice.</p>';
-  else{const f=r.fs,cur=num(S.rifle.blade);const where=f.useB?'with the battle aperture':'with the sight set to '+f.Z;
-    fh+='<p>At '+f.Z+' yd '+where+', groups should land <b class="num">'+sgn(f.poi)+' in</b> '+(hiLo(f.poi)||'on')+' ('+sgn(f.E,2)+' MOA).</p>';
-    if(f.steps===0)fh+='<div class="callout">Your current foresight is within half a blade size of right for '+f.Z+' yd. No change needed.</div>';
-    else{const taller=f.steps>0;fh+='<div class="callout">A foresight blade about <b class="num">'+Math.abs(f.dh).toFixed(3)+' in '+(taller?'taller':'shorter')+'</b> (≈ '+Math.abs(f.steps)+' size'+(Math.abs(f.steps)>1?'s':'')+' '+(taller?'up':'down')+') would make the sight true at '+f.Z+' yd'+(cur!==null?': about <b class="num">'+(cur+f.steps*f.st).toFixed(3)+' in</b>':'')+'. A taller blade lowers the group. After changing it, shoot a confirming group and add it here.</div>';}
-    fh+='<p class="hint">Based on a sight radius of '+(num(S.rifle.sightRadius)||28)+' in. The settings table is for the blade currently fitted.</p>';}
-  $('foresight').innerHTML=fh;
-  // table
-  $('thBattle').style.display=hasBattle()?'':'none';$('thClicks').style.display=T0==='mk1'?'':'none';
-  const tb=document.querySelector('#settings tbody');
-  tb.innerHTML=r.rows.map(x=>{const b=x.best;return '<tr'+(x.trans?' class="warnrow" title="Near the speed of sound: less certain"':'')+'><td class="num" style="text-align:left">'+x.R+'</td><td>'+(b?'<span class="set">'+lab(b.label)+'</span>':'–')+'</td>'+(T0==='mk1'?'<td class="num col-x">'+(b?sgn(b.tot,0):'–')+'</td>':'')+'<td class="num">'+(b?sgn(b.poi)+' in <span class="hint">('+sgn(b.poi/ipm(x.R))+' MOA)</span>':'–')+'</td><td class="num col-x">'+fmtExact(x.exact)+'</td>'+(hasBattle()?'<td class="num">'+sgn(x.battle)+' in</td>':'')+'<td class="num">'+x.drift.toFixed(1)+' in</td><td class="num col-x">'+Math.round(x.vel)+'</td><td class="num col-x">'+x.tof.toFixed(2)+'</td></tr>';}).join('')||'<tr><td colspan="9">No ranges to show.</td></tr>';
-  // lollipop table
-  $('lolli').querySelector('thead').innerHTML='<tr><th>Range (yd)</th>'+r.holds.map(t=>'<th>'+esc(t.name)+(t.rb?'':'<div class="hint" style="margin:0;font-weight:400">centre '+t.hold.toFixed(1)+' in above foot</div>')+'</th>').join('')+'</tr>';
-  $('lolli').querySelector('tbody').innerHTML=r.rows.map(x=>'<tr'+(x.trans?' class="warnrow"':'')+'><td class="num" style="text-align:left">'+x.R+'</td>'+x.lolli.map((l,i)=>'<td>'+(l?'<span class="set">'+lab(l.c.label)+'</span> <span class="hint">'+sgn(l.c.off)+' in</span>'+(r.holds[i].rb?'<div class="hint" style="margin:0">hold-off '+l.hold.toFixed(1)+' in</div>':''):'<span class="hint">–</span>')+'</td>').join('')+'</tr>').join('');
-  drawChart(r);
-  try{drawTraj(r);}catch(e){$('trjInfo').textContent='Could not draw the trajectory.';}
-}
-
-function trjAmmo(id){if(id==='current')return{name:(S.ammo.name||'Current load')+' (current)',am:S.ammo};const p=AMMO.find(x=>x.id===id);return p?{name:p.name,am:p}:null;}
-function fillTrjSelects(){document.querySelectorAll('.trjAmmo').forEach(sel=>{const v=getP(sel.dataset.k);sel.innerHTML=(sel.dataset.none?'<option value="">None</option>':'')+'<option value="current">Current load: '+esc(S.ammo.name||'as entered')+'</option>'+AMMO.map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join('');sel.value=v??'';});}
-let TRJ=null;
-function drawTraj(r){
-  const ps=parseSetting(S.trj.set);const box=$('trjPlot');
-  let max=Math.round(Math.min(2000,Math.max(200,num(S.trj.max)||1000))/100)*100;
-  if(!ps){box.innerHTML='';$('trjInfo').textContent='Enter a sight setting, e.g. 300, 500 (add clicks in the next box) or B for the battle aperture.';$('trjTable').querySelector('tbody').innerHTML='';return;}
-  let th,desc;
-  if(ps.battle){th=r.battleAngle;desc='battle aperture';}
-  else{const clk=ps.clicks+(num(S.trj.clk)||0);th=r.a+r.b*(r.nomAt(ps.mark)+clk*r.U);desc=ps.mark+(clk?(clk>0?' +':' \u2212')+Math.abs(clk)+' click'+(Math.abs(clk)===1?'':'s'):'');}
-  if(isNaN(th)){box.innerHTML='';$('trjInfo').textContent='That setting is outside the sight scale.';return;}
-  const h=(num(S.rifle.sightHeight)??1)*0.0254;
-  const ser=[S.trj.a,S.trj.b].filter((v,i)=>v&&(i===0||v!==S.trj.a)).map(trjAmmo).filter(Boolean).map(x=>{const tr=traj(x.am,S.atm);const yIn=R=>R>tr.reach?NaN:((th/MOA)*R*YD-h+lerpArr(tr.y,R))/0.0254;return Object.assign(x,{tr,yIn});});
-  if(!ser.length){box.innerHTML='';return;}
-  // stats for each series
-  ser.forEach(x=>{let maxY=-1e9,maxR=0,cross=[];let prev=x.yIn(1);for(let R=1;R<=max;R++){const y=x.yIn(R);if(y>maxY){maxY=y;maxR=R;}if(R>1&&prev<0&&y>=0)cross.push(R);if(R>1&&prev>=0&&y<0)cross.push(R);prev=y;}x.maxY=maxY;x.maxR=maxR;x.cross=cross;});
-  $('trjInfo').innerHTML='Sight at <b>'+esc(desc)+'</b>: the bore points '+th.toFixed(1)+' MOA above your line of sight.'+ser.map((x,i)=>'<br><span style="color:'+(i?'var(--accent2)':'var(--accent)')+';font-weight:600">'+esc(x.name)+'</span>: crosses line of sight at '+(x.cross.length?x.cross.map(c=>c+' yd').join(' and '):'none in range')+'; highest '+sgn(x.maxY)+' in at '+x.maxR+' yd.').join('');
-  // plot
-  const cw=box.clientWidth||700,W=Math.round(Math.max(330,Math.min(700,cw))),H=Math.round(W<500?W*0.72:300),m={l:W<500?46:54,r:12,t:16,b:34};
-  let lo=0,hi=0;ser.forEach(x=>{for(let R=0;R<=max;R+=5){const y=R?x.yIn(R):-h/0.0254;if(isFinite(y)){lo=Math.min(lo,y);hi=Math.max(hi,y);}}});
-  const span=(hi-lo)||10,stepY=[2,5,10,20,25,50,100,200,500].find(s=>span/s<=8)||1000;lo=Math.floor(lo/stepY)*stepY;hi=Math.ceil(hi/stepY)*stepY;if(hi===lo)hi=lo+stepY;
-  const X=v=>m.l+v/max*(W-m.l-m.r),Y=v=>H-m.b-(v-lo)/(hi-lo)*(H-m.t-m.b);
-  let g='<svg id="trjSvg" viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:'+W+'px;display:block;margin-top:10px;touch-action:pan-y" role="img" aria-label="Bullet trajectory relative to line of sight">';
-  for(let v=lo;v<=hi+1e-9;v+=stepY)g+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(m.l-6)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+(v>0?'+':'')+v+'</text>';
-  const xs=(max>1000||W<500)?200:100;for(let v=0;v<=max;v+=xs)g+='<text x="'+X(v)+'" y="'+(H-m.b+16)+'" text-anchor="middle">'+v+'</text>';
-  g+='<text x="'+((m.l+W-m.r)/2)+'" y="'+(H-4)+'" text-anchor="middle">Range (yd)</text><text transform="translate(12,'+((m.t+H-m.b)/2)+') rotate(-90)" text-anchor="middle">Inches above / below line of sight</text>';
-  g+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+Y(0)+'" y2="'+Y(0)+'" stroke="var(--ink)" stroke-width="1.2" stroke-dasharray="6 4"/>';
-  ser.forEach((x,i)=>{let d='M'+X(0).toFixed(1)+' '+Y(-h/0.0254).toFixed(1);for(let R=5;R<=max;R+=5){const y=x.yIn(R);if(!isFinite(y))break;d+=' L'+X(R).toFixed(1)+' '+Y(y).toFixed(1);}
-    const c=i?'var(--accent2)':'var(--accent)';g+='<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="2.5"'+(i?' stroke-dasharray="8 4"':'')+'/>';
-    x.cross.forEach(cr=>g+='<circle cx="'+X(cr)+'" cy="'+Y(0)+'" r="4" fill="'+c+'" stroke="var(--card)" stroke-width="1.5"/>');});
-  g+='<g id="trjCur" style="display:none"><line id="trjCurL" y1="'+m.t+'" y2="'+(H-m.b)+'" stroke="var(--muted)"/><rect id="trjCurB" rx="5" fill="var(--card)" stroke="var(--line)"/><text id="trjCurT" style="font-size:12px;fill:var(--ink)"></text></g>';
-  g+='<rect id="trjHit" x="'+m.l+'" y="'+m.t+'" width="'+(W-m.l-m.r)+'" height="'+(H-m.t-m.b)+'" fill="transparent"/></svg>';
-  g+='<div class="legend">'+ser.map((x,i)=>'<span style="--c:'+(i?'var(--accent2)':'var(--accent)')+'">'+esc(x.name)+'</span>').join('')+'<span style="--c:var(--ink)">Line of sight</span></div>';
-  box.innerHTML=g;TRJ={ser,X,max,m,W,H};
-  const svg=$('trjSvg');const move=e=>{const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const p=pt.matrixTransform(svg.getScreenCTM().inverse());
-    let R=Math.round((p.x-m.l)/(W-m.l-m.r)*max/5)*5;R=Math.max(5,Math.min(max,R));const cx=X(R);
-    const lines=[R+' yd'].concat(ser.map(x=>{const y=x.yIn(R);return (ser.length>1?(x.name.split(' (')[0].slice(0,18)+': '):'')+(isFinite(y)?sgn(y)+' in':'–');}));
-    $('trjCur').style.display='';$('trjCurL').setAttribute('x1',cx);$('trjCurL').setAttribute('x2',cx);
-    const t=$('trjCurT');t.innerHTML=lines.map((l,i)=>'<tspan x="0" dy="'+(i?15:0)+'"'+(i?'':' style="font-weight:600"')+'>'+esc(l)+'</tspan>').join('');
-    const bw=Math.max(...lines.map(l=>l.length))*6.6+14,bh=lines.length*15+8;let bx=cx+8;if(bx+bw>W-m.r)bx=cx-8-bw;const by=m.t+4;
-    const bb=$('trjCurB');bb.setAttribute('x',bx);bb.setAttribute('y',by);bb.setAttribute('width',bw);bb.setAttribute('height',bh);
-    t.setAttribute('transform','translate('+(bx+7)+','+(by+15)+')');[...t.children].forEach(c=>c.setAttribute('x',0));};
-  svg.addEventListener('pointermove',move);svg.addEventListener('pointerdown',move);svg.addEventListener('pointerleave',()=>{$('trjCur').style.display='none';});
-  // table
-  const st=max>1000?100:50;const rs=[];for(let R=st;R<=max;R+=st)rs.push(R);
-  $('trjTable').querySelector('thead').innerHTML='<tr><th>Range (yd)</th>'+ser.map(x=>'<th class="num">'+esc(x.name.split(' (')[0])+'</th>').join('')+'</tr>';
-  $('trjTable').querySelector('tbody').innerHTML=rs.map(R=>'<tr><td class="num" style="text-align:left">'+R+'</td>'+ser.map(x=>{const y=x.yIn(R);return'<td class="num">'+(isFinite(y)?sgn(y)+' in':'–')+'</td>';}).join('')+'</tr>').join('');
-}
-
-function drawChart(r){
-  const rows=r.rows.filter(x=>isFinite(x.exact)&&x.exact>0);if(rows.length<2){$('chart').innerHTML='';return;}
-  const W=700,H=260,m={l:52,r:14,t:14,b:34};
-  const x0=rows[0].R,x1=rows[rows.length-1].R;
-  const ys=rows.flatMap(x=>[x.exact,x.R]).concat(r.implied.filter(p=>p.R>=x0&&p.R<=x1).map(p=>p.s));
-  const y0=Math.floor(Math.min(...ys)/100)*100,y1=Math.ceil(Math.max(...ys)/100)*100||100;
-  const X=v=>m.l+(v-x0)/(x1-x0||1)*(W-m.l-m.r),Y=v=>H-m.b-(v-y0)/(y1-y0||1)*(H-m.t-m.b);
-  let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:'+W+'px;display:block;margin-top:14px" role="img" aria-label="Sight setting needed by range">';
-  const ystep=(y1-y0)>800?200:100,xstep=(x1-x0)>800?200:100;
-  for(let v=y0;v<=y1;v+=ystep)s+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--line)"/><text x="'+(m.l-6)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+v+'</text>';
-  for(let v=Math.ceil(x0/xstep)*xstep;v<=x1;v+=xstep)s+='<text x="'+X(v)+'" y="'+(H-m.b+16)+'" text-anchor="middle">'+v+'</text>';
-  s+='<text x="'+((m.l+W-m.r)/2)+'" y="'+(H-4)+'" text-anchor="middle">Range (yd)</text><text transform="translate(12,'+((m.t+H-m.b)/2)+') rotate(-90)" text-anchor="middle">Sight setting</text>';
-  s+='<line x1="'+X(x0)+'" y1="'+Y(x0)+'" x2="'+X(x1)+'" y2="'+Y(x1)+'" stroke="var(--muted)" stroke-dasharray="4 4"/>';
-  s+='<path d="'+rows.map((x,i)=>(i?'L':'M')+X(x.R).toFixed(1)+' '+Y(x.exact).toFixed(1)).join(' ')+'" fill="none" stroke="var(--accent)" stroke-width="2.5"/>';
-  r.implied.forEach(p=>{if(p.R>=x0&&p.R<=x1)s+='<circle cx="'+X(p.R)+'" cy="'+Y(p.s)+'" r="4.5" fill="var(--accent2)" stroke="var(--card)" stroke-width="1.5"/>';});
-  s+='</svg><div class="legend"><span style="--c:var(--accent)">Setting needed (model)</span><span style="--c:var(--muted)">Setting = range</span><span style="--c:var(--accent2)">Setting each test group implies</span></div>';
-  $('chart').innerHTML=s;
-}
-
-function renderFirings(){
-  const tb=document.querySelector('#firings tbody');
-  if(!S.firings.length){tb.innerHTML='<tr><td colspan="15" class="hint" style="padding:10px 6px">No firings yet. Add your first group.</td></tr>';return;}
-  const inp=(f,i,k,cls,type,step,extra)=>'<input class="'+cls+'" type="'+type+'"'+(step?' step="'+step+'"':'')+' data-i="'+i+'" data-f="'+k+'" value="'+esc(f[k])+'"'+(extra||'')+'>';
-  const pm=(i,k)=>'<button type="button" class="pm" data-pm="'+k+'" data-i="'+i+'" title="Flip sign (+/−)" aria-label="Flip sign">±</button>';
-  const td=(c,l,h)=>'<td class="'+c+'" data-label="'+l+'">'+h+'</td>';
-  tb.innerHTML=S.firings.map((f,i)=>'<tr>'+
-    td('c-use','Use','<label class="check" style="font-size:13px"><input type="checkbox" data-i="'+i+'" data-f="inc"'+(f.inc?' checked':'')+'><span class="ph">Use this group</span></label>')+
-    td('c-date','Date',inp(f,i,'date','w-d','date'))+
-    td('c-range','Range (yd)',inp(f,i,'range','w-s','number','25',' inputmode="numeric"'))+
-    td('c-set','Sight set',inp(f,i,'setting','w-s','text','',' placeholder="300 or B" autocapitalize="characters"'))+
-    td('c-clk','Clicks ±','<div class="pmw">'+inp(f,i,'clk','w-s','number','1',' placeholder="0"')+pm(i,'clk')+'</div>')+
-    td('c-shots','Shots',inp(f,i,'shots','w-s','number','1',' min="1" inputmode="numeric"'))+
-    td('c-unit','Units','<select data-i="'+i+'" data-f="unit">'+[['in','in'],['moa','MOA'],['zr','ZR card in']].map(o=>'<option value="'+o[0]+'"'+((f.unit||'in')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>')+
-    td('c-aim','Aim','<select data-i="'+i+'" data-f="aim">'+[['poi','Point of impact'],['lolli','Lollipop (6 o\'clock)']].map(o=>'<option value="'+o[0]+'"'+((f.aim||'poi')===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>')+
-    td('c-tgt','Target','<select data-i="'+i+'" data-id="'+esc(f.id)+'" data-f="tgt"'+(f.aim==='lolli'?'':' disabled')+'>'+lolliTargets().map(t=>'<option value="'+t.key+'"'+((f.tgt||'f11')===t.key?' selected':'')+'>'+esc(t.name)+'</option>').join('')+'</select>')+
-    td('c-dy','Up/down (+ high)','<div class="pmw">'+inp(f,i,'dy','w-m','number','0.25')+pm(i,'dy')+'</div>')+
-    td('c-dx','Left/right (+ right)','<div class="pmw">'+inp(f,i,'dx','w-m','number','0.25')+pm(i,'dx')+'</div>')+
-    td('c-grp','Group size',inp(f,i,'group','w-s','number','0.25',' min="0"')+'<div class="hint" id="grp-'+esc(f.id)+'" style="margin:2px 0 0;white-space:nowrap"></div>')+
-    td('c-notes','Notes',inp(f,i,'notes','','text','',' placeholder="Light, wind, position…"'))+
-    '<td class="num c-res" data-label="Model / residual" id="res-'+esc(f.id)+'">–</td>'+
-    '<td class="c-del"><button class="x" data-del="'+i+'" title="Delete this firing">×</button></td></tr>').join('');
-}
-const onFiring=e=>{const el=e.target,i=+el.dataset.i,k=el.dataset.f;if(isNaN(i)||!k||!S.firings[i])return;
-  S.firings[i][k]=el.type==='checkbox'?el.checked:(el.type==='number'?num(el.value):el.value);changed();};
-document.querySelector('#firings').addEventListener('input',onFiring);document.querySelector('#firings').addEventListener('change',e=>{if(e.target.tagName==='SELECT')onFiring(e);});
-document.querySelector('#firings').addEventListener('click',e=>{const pb=e.target.closest('[data-pm]');if(pb){const i=+pb.dataset.i,k=pb.dataset.pm,v=num(S.firings[i]&&S.firings[i][k]);if(v===null||v===0){pb.previousElementSibling.focus();return;}S.firings[i][k]=-v;pb.previousElementSibling.value=-v;changed();return;}
-  const d=e.target.closest('[data-del]');if(!d)return;const i=+d.dataset.del;
-  if(d.dataset.armed!=='1'){d.dataset.armed='1';d.textContent='delete?';d.style.color='var(--warn)';d.style.fontSize='12px';setTimeout(()=>{if(d.isConnected){d.dataset.armed='';d.textContent='×';d.style.color='';d.style.fontSize='';}},3000);return;}
-  S.firings.splice(i,1);renderFirings();changed();});
-$('addBtn').addEventListener('click',()=>{const last=S.firings[S.firings.length-1];
-  S.firings.push({id:Math.random().toString(36).slice(2,9),inc:true,date:last?last.date:new Date().toISOString().slice(0,10),range:last?last.range:300,setting:last?last.setting:'300',clk:null,aim:last?last.aim||'poi':'poi',tgt:last?last.tgt||'f11':'f11',shots:last?last.shots:5,unit:last?last.unit||'in':'in',dy:null,dx:null,group:null,notes:''});
-  renderFirings();changed();const rows=document.querySelectorAll('#firings tbody tr');const inp=rows[rows.length-1]?.querySelector('[data-f="dy"]');if(inp){const rr=rows[rows.length-1];if(rr.scrollIntoView)rr.scrollIntoView({block:'center'});inp.focus({preventScroll:true});}});
-
-/* ---------- bound fields ---------- */
-function getP(p){return p.split('.').reduce((o,k)=>o==null?undefined:o[k],S);}
-function setP(p,v){const ks=p.split('.');let o=S;for(let i=0;i<ks.length-1;i++){if(typeof o[ks[i]]!=='object'||!o[ks[i]])o[ks[i]]={};o=o[ks[i]];}o[ks[ks.length-1]]=v;}
-function fill(){fillTrjSelects();document.querySelectorAll('[data-k]').forEach(el=>{const v=getP(el.dataset.k);if(el.type==='checkbox')el.checked=!!v;else el.value=v??'';});syncSight();syncAmmo();}
-document.querySelectorAll('[data-k]').forEach(el=>{el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{
-  const v=el.type==='checkbox'?el.checked:(el.type==='number'?num(el.value):el.value);setP(el.dataset.k,v);if(el.id==='sightType')syncSight();if(/^ammo\./.test(el.dataset.k)){syncAmmo();if(el.dataset.k==='ammo.name')fillTrjSelects();}changed();});});
-function syncSight(){const T=st();const show=(cls,on)=>document.querySelectorAll('.'+cls).forEach(e=>e.style.display=on?'':'none');
-  show('opt-mk1',T==='mk1');show('opt-mk34',T==='mk3'||T==='mk4');show('opt-custom',T==='custom');show('opt-battle',SIGHTS[T].battle);$('sightHint').textContent=SIGHTS[T].hint;}
-function syncAmmo(){const sel=$('ammoPreset');const m=AMMO.find(x=>x.name===S.ammo.name&&+x.bc===+S.ammo.bc&&+x.mv===+S.ammo.mv&&+x.weight===+S.ammo.weight);sel.value=m?m.id:'';
-  const p=AMMO.find(x=>x.name===S.ammo.name);$('ammoNote').textContent=p?p.note+(m?'':' (You have edited the preset figures.)'):'';}
-$('ammoPreset').innerHTML='<option value="">Choose to fill in the boxes below…</option>'+AMMO.map(x=>'<option value="'+x.id+'">'+esc(x.name)+'</option>').join('');
-$('ammoPreset').addEventListener('change',e=>{const p=AMMO.find(x=>x.id===e.target.value);if(!p)return;Object.assign(S.ammo,{name:p.name,weight:p.weight,bc:p.bc,mv:p.mv,chrono:false});fill();changed();});
-
-/* ---------- save / drafts ---------- */
-const DKEY='no4-sight-book-draft',LKEY='no4-sight-book-local';
-function saveDraft(){try{localStorage.setItem(DKEY,JSON.stringify({base:S.savedAt||null,state:S}));}catch(e){}}
-function clearDraft(){try{localStorage.removeItem(DKEY);}catch(e){}}
-function updateStatus(){const st=$('status');if(dirty){st.textContent='Unsaved changes';st.className='dirty';}else{st.className='';st.textContent=S.savedAt?'Saved '+new Date(S.savedAt).toLocaleString([], {dateStyle:'medium',timeStyle:'short'}):'Not saved yet';}
-  $('saveBtn').disabled=false;}
-function changed(){dirty=true;updateStatus();saveDraft();recompute();}
-function buildDoc(){const json=JSON.stringify(S).replace(/</g,'\\u003c');
-  return '<!DOCTYPE html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Peep &amp; Post</title>'+FONT+PAGE.css+'</head><body>'+PAGE.app+'<script type="application/json" id="state">'+json+'<\/script>'+PAGE.main+'</body></html>';}
-async function getArt(){if(ART||artTried)return ART;artTried=true;try{if(window.claude&&typeof window.claude.use==='function')ART=await window.claude.use('artifact');}catch(e){ART=null;}return ART;}
-$('saveBtn').addEventListener('click',async()=>{$('msg').textContent='';const art=await getArt();
-  if(!art){try{S.savedAt=new Date().toISOString();localStorage.setItem(LKEY,JSON.stringify(S));dirty=false;clearDraft();updateStatus();$('msg').textContent='Saved on this device. Use "Download backup file" now and then to keep a copy safe.';}catch(e){$('msg').textContent='This browser won\u2019t let the page save. Use "Download backup file" to keep a copy.';}return;}
-  const prev=S.savedAt;S.savedAt=new Date().toISOString();$('status').textContent='Saving…';
-  try{await art.publish(buildDoc());dirty=false;clearDraft();updateStatus();}
-  catch(e){S.savedAt=prev;const c=e&&(e.code||e.name)||'';
-    $('msg').textContent=c==='conflict'?'Someone saved a newer version; the page will reload.':(c==='not_granted'||c==='not_writer')?'This copy is read-only for you.':'Save failed'+(c?' ('+c+')':'')+'. Your changes are kept on this device.';updateStatus();}});
-window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
-
-/* ---------- export / import / copy ---------- */
-function exportText(){return JSON.stringify(S,null,1);}
-async function copyText(t,btn){try{await navigator.clipboard.writeText(t);const o=btn.textContent;btn.textContent='Copied';setTimeout(()=>btn.textContent=o,1500);}catch(e){$('io').value=t;$('io').closest('details').open=true;$('io').select();$('msg').textContent='Couldn’t copy automatically; the text is selected in the backup box below.';}}
-$('exportBtn').addEventListener('click',e=>{$('io').value=exportText();copyText($('io').value,e.target);});
-$('importBtn').addEventListener('click',()=>{try{const o=JSON.parse($('io').value);if(!o||typeof o!=='object'||!o.rifle)throw 0;const keep=S.savedAt;S=merge(DEFAULTS,o);S.savedAt=keep;
-  S.firings=(Array.isArray(S.firings)?S.firings:[]).map(f=>Object.assign({id:Math.random().toString(36).slice(2,9),inc:true},f));fill();renderFirings();changed();$('msg').textContent='';}catch(e){$('msg').textContent='That text isn’t a valid sight book backup.';}});
-$('copyBtn').addEventListener('click',e=>{const r=LAST;if(!r)return;
-  const lines=['Sight settings'+(S.rifle.name?' — '+S.rifle.name:''),(S.ammo.name||'Load')+': '+S.ammo.weight+' gr, '+S.ammo.mv+' fps, G1 '+S.ammo.bc+' | '+S.atm.T+'°C '+S.atm.P+' hPa',''];
-  lines.push(['Range','Set','Impact(in)','Exact'].concat(hasBattle()?['Battle(in)']:[]).concat(['Drift10mph(in)']).join('\t'));
-  r.rows.forEach(x=>lines.push([x.R,x.best?x.best.label.replace('\u2212','-'):'-',x.best?sgn(x.best.poi).replace('−','-'):'-',fmtExact(x.exact)].concat(hasBattle()?[sgn(x.battle).replace('−','-')]:[]).concat([x.drift.toFixed(1)]).join('\t')));
-  copyText(lines.join('\n'),e.target);});
-
-$('copyLolliBtn').addEventListener('click',e=>{const r=LAST;if(!r)return;
-  const lines=['Lollipop (6 o\'clock) settings'+(S.rifle.name?' \u2014 '+S.rifle.name:''),(S.ammo.name||'Load')+': '+S.ammo.weight+' gr, '+S.ammo.mv+' fps','',['Range'].concat(r.holds.map(t=>t.name)).join('\t')];
-  r.rows.forEach(x=>lines.push([x.R].concat(x.lolli.map(l=>l?l.c.label.replace('\u2212','-')+' ('+sgn(l.c.off).replace('\u2212','-')+'in)':'-')).join('\t')));copyText(lines.join('\n'),e.target);});
-
-$('moreCols').addEventListener('click',e=>{const on=document.body.classList.toggle('allcols');e.target.textContent=on?'Fewer columns':'Show all columns';});
-
-function loadObj(o){if(!o||typeof o!=='object'||!o.rifle)throw 0;const keep=S.savedAt;S=merge(DEFAULTS,o);S.savedAt=keep;
-  S.firings=(Array.isArray(S.firings)?S.firings:[]).map(f=>Object.assign({id:Math.random().toString(36).slice(2,9),inc:true},f));fill();renderFirings();changed();}
-$('dlBtn').addEventListener('click',()=>{const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='no4-sight-book-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);});
-$('ulFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{loadObj(JSON.parse(t));$('msg').textContent='Backup loaded. Press Save to keep it.';}catch(err){$('msg').textContent='That file isn\u2019t a sight book backup.';}});});
-
-/* ---------- start ---------- */
-if(!SIGHTS[S.rifle.sightType])S.rifle.sightType='mk1';
-if(S.lolli&&+S.lolli.f12h===546)S.lolli.f12h=570; // old estimate -> Handbook-based value
-if(!Array.isArray(S.firings))S.firings=[];
-S.firings.forEach(f=>{if(!f.id)f.id=Math.random().toString(36).slice(2,9);});
-fill();renderFirings();updateStatus();recompute();
-try{const d=JSON.parse(localStorage.getItem(DKEY)||'null');
-  if(d&&d.state&&(d.base||null)===(S.savedAt||null)&&JSON.stringify(merge(DEFAULTS,d.state))!==JSON.stringify(S)){$('draftBanner').hidden=false;
-    $('restoreBtn').onclick=()=>{S=merge(DEFAULTS,d.state);fill();renderFirings();$('draftBanner').hidden=true;changed();};
-    $('discardBtn').onclick=()=>{clearDraft();$('draftBanner').hidden=true;};}
-  else if(d&&(d.base||null)!==(S.savedAt||null))clearDraft();}catch(e){}
-getArt().then(a=>{if(a)return;try{if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js');}catch(e){}document.querySelectorAll('.standalone').forEach(e=>e.style.display='');
-  if(!S.savedAt){try{const l=JSON.parse(localStorage.getItem(LKEY)||'null');if(l&&l.rifle){S=merge(DEFAULTS,l);fill();renderFirings();dirty=false;updateStatus();recompute();}}catch(e){}}
-  if(!S.savedAt)$('status').textContent='Saves on this device';});
-})();
-</script>
-</body></html>
+<script src="js/data.js"></script>
+<script src="js/ballistics.js"></script>
+<script src="js/plot.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
