@@ -1,6 +1,6 @@
 // Peep & Post service worker: lets the app open with no signal on the range.
-// Bump VERSION whenever you change any app file so phones pick up the update.
-const VERSION = 'pp-v3';
+// Bump VERSION whenever you change any app file so installed copies refresh their saved files.
+const VERSION = 'pp-v4';
 const CORE = [
   './',
   './index.html',
@@ -16,7 +16,10 @@ const CORE = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));
+  // cache: 'reload' skips the browser's own HTTP cache so a new version really gets the new files.
+  event.waitUntil(caches.open(VERSION)
+    .then(cache => cache.addAll(CORE.map(u => new Request(u, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', event => {
@@ -27,31 +30,33 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Try the network first (so updates show straight away), but don't wait more than a few
+// seconds on a poor signal: fall back to the saved copy.
+function networkFirst(req, key) {
+  return new Promise(resolve => {
+    let done = false;
+    const fromCache = () => caches.match(key || req).then(hit => hit || caches.match('./index.html'));
+    const timer = setTimeout(() => { if (!done) fromCache().then(hit => { if (hit && !done) { done = true; resolve(hit); } }); }, 3500);
+    fetch(req, { cache: 'no-cache' }).then(res => {
+      if (res && res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(key || req, copy)); }
+      if (!done) { done = true; clearTimeout(timer); resolve(res); }
+    }).catch(() => fromCache().then(hit => { if (!done) { done = true; clearTimeout(timer); resolve(hit || Response.error()); } }));
+  });
+}
+
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-
-  // The app page itself: try the network first so updates show up, fall back to the cached copy offline.
-  if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req)
-        .then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return res; })
-        .catch(() => caches.match('./index.html'))
-    );
+  if (url.origin === location.origin) {
+    event.respondWith(networkFirst(req, req.mode === 'navigate' ? './index.html' : undefined));
     return;
   }
-
-  // Everything else (icons, Google Fonts): cached copy first, refresh in the background.
-  if (url.origin === location.origin || /fonts\.(googleapis|gstatic)\.com$/.test(url.hostname)) {
-    event.respondWith(
-      caches.match(req).then(hit => {
-        const net = fetch(req).then(res => {
-          if (res && (res.ok || res.type === 'opaque')) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
-          return res;
-        }).catch(() => hit);
-        return hit || net;
-      })
-    );
+  // Google Fonts: saved copy first, refreshed in the background.
+  if (/fonts\.(googleapis|gstatic)\.com$/.test(url.hostname)) {
+    event.respondWith(caches.match(req).then(hit => {
+      const net = fetch(req).then(res => { if (res && (res.ok || res.type === 'opaque')) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); } return res; }).catch(() => hit);
+      return hit || net;
+    }));
   }
 });
