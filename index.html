@@ -42,14 +42,6 @@
     <div class="btnrow"><button id="addRifleBtn" class="primary">Add rifle</button></div>
   </section>
 
-  <section class="card">
-    <h2>Conditions</h2>
-    <div class="fields" style="max-width:420px">
-      <label>Air temperature (°C)<input data-k="atm.T" type="number" step="1"></label>
-      <label>Air pressure at range (hPa)<input data-k="atm.P" type="number" step="1"></label>
-    </div>
-    <p class="hint">Shared by all your rifles. Use the actual (station) pressure at the range, not the sea-level figure from a forecast.</p>
-  </section>
 
   <section class="card">
     <h2>Ammunition</h2>
@@ -73,6 +65,18 @@
       <label>Round bull targets<select data-k="lolli.rb"><option value="nra">NRA TR Round Bull, 2025 on (aiming mark 406 / 560 / 813 / 990 / 1120 mm)</option><option value="hbsa">NRA/HBSA Historic (aiming mark 12 / 18 / 36 in)</option></select></label>
     </div>
     <p class="hint">From the 2026 NRA Handbook (Bisley Bible), Appendix V, and the NRA CSR Handbook. The Fig 11 height (1140 mm) is from MoD range design guidance, and Fig 12 is the top half of a Fig 11. Change any of these if your targets differ.</p>
+  </section>
+
+  <section class="card">
+    <details id="atmBox"><summary style="margin-top:0">Advanced: non-standard atmosphere</summary>
+      <p class="hint">All calculations use the ISO standard atmosphere (15 °C, 1013.25 hPa), which is plenty for service rifles shooting 2–4 MOA groups. Out to 600 yd, a cold or hot day moves the elevation by well under 1 MOA. At 900–1000 yd it can reach 2–3 MOA, so long-range shooters may want to enter the day's figures here. They apply to every rifle.</p>
+      <div class="fields" style="max-width:420px">
+        <label>Air temperature (°C)<input data-k="atm.T" type="number" step="1"></label>
+        <label>Air pressure at range (hPa)<input data-k="atm.P" type="number" step="0.25"></label>
+      </div>
+      <p class="hint">Use the actual (station) pressure at the range, not the sea-level figure from a forecast.</p>
+      <div class="btnrow"><button id="atmReset" class="small">Back to standard (15 °C, 1013.25 hPa)</button></div>
+    </details>
   </section>
 
   <section class="card">
@@ -126,7 +130,8 @@
         </div>
         <div id="ammoInfo" class="kv" style="margin-top:10px"></div>
         <p class="hint" id="ammoNote"></p>
-        <p class="hint">Add or edit your own loads on the Home tab. Conditions (temperature and pressure) are on the Home tab too.</p>
+        <p class="hint">Add or edit your own loads on the Home tab.</p>
+        <p class="hint" id="atmNote"></p>
         <details><summary>Advanced: what the sight scale was laid out for, and fitting</summary>
           <div class="fields">
             <label class="full">Reference load<select id="refPreset"><option value="">Custom…</option></select></label>
@@ -168,6 +173,7 @@
       <p class="hint phone-note" style="display:none">On a micrometer sight, <b>+2</b> / <b>−1</b> after a mark means clicks up or down from it.</p>
       <div class="scroll"><table id="settings"><thead><tr>
         <th>Range (yd)</th><th>Set sight to</th><th class="num col-x" id="thClicks">Clicks from 200</th><th class="num">Expected impact</th><th class="num col-x">Exact setting</th><th class="num" id="thBattle">Battle aperture impact</th><th class="num">10 mph crosswind drift</th><th class="num col-x">Velocity (fps)</th><th class="num col-x">Time of flight (s)</th></tr></thead><tbody></tbody></table></div>
+      <p class="hint" id="atmNote2"></p>
       <p class="hint">Expected impact is where the group centre should land relative to point of aim at that setting (+ high). "Exact setting" is where to set the slide if you could set it anywhere. Wind drift is for a full-value (right-angle) wind; aim off into the wind. Rows in orange are near the speed of sound and less certain.</p>
       <div id="chart"></div>
     </section>
