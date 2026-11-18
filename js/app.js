@@ -11,7 +11,7 @@
   /* ---------------- state ---------------- */
   const DEFAULTS = {
     v: 2, active: 'home', panel: 'setup',
-    atm: { T: 15, P: 1013 },
+    atm: { T: 15, P: 1013.25 },
     lolli: { f11h: 1140, f11c: 506, f12h: 570, f12c: 300, f12ch: 400, f12cc: 200, rb: 'nra' },
     ammo: [], rifles: [], savedAt: null
   };
@@ -62,10 +62,11 @@
   let S;
   function load() {
     let raw = null; try { raw = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { }
-    if (raw && raw.v === 2) return mergeDefaults(raw);
+    if (raw && raw.v === 2) { const s2 = mergeDefaults(raw); if (+s2.atm.T === 15 && +s2.atm.P === 1013) s2.atm.P = 1013.25; return s2; }
     const s = mergeDefaults(null);
     try { const old = JSON.parse(localStorage.getItem(OLDKEY) || 'null'); if (old && old.rifle) { const m = fromV1(old); s.rifles.push(m.rifle); if (m.custom) s.ammo.push(m.custom); if (m.lolli) Object.assign(s.lolli, m.lolli); if (m.atm) Object.assign(s.atm, m.atm); s.active = m.rifle.id; } } catch (e) { }
     if (s.lolli && +s.lolli.f12h === 546) s.lolli.f12h = 570;
+    if (+s.atm.T === 15 && +s.atm.P === 1013) s.atm.P = 1013.25;
     return s;
   }
   S = load(); PP.state = S;
@@ -102,6 +103,8 @@
   /* ---------------- sight helpers ---------------- */
   function parseGrads(s) { const out = []; String(s || '').split(/[,;\s]+/).forEach(tok => { if (!tok) return; const m = tok.match(/^(\d+)-(\d+)(?:\/(\d+))?$/); if (m) { let a = +m[1], b = +m[2], st = +(m[3] || 100); if (st <= 0) st = 100; for (let x = a; x <= b + 1e-9 && out.length < 500; x += st) out.push(x); } else if (isFinite(+tok) && tok !== '') out.push(+tok); }); return [...new Set(out)].filter(x => x >= 100 && x <= 2500).sort((a, b) => a - b); }
   function gradsOf(R) { const sd = sightDef(R); if (sd.kind === 'fixed') return sd.grads.slice(); if (sd.kind === 'steps') return PP.rng(sd.min, sd.max, Math.max(25, num(R.notchStep) || sd.step)); if (sd.kind === 'custom') return parseGrads(R.grads); return []; }
+  const isStdAtm = () => (num(S.atm.T) ?? 15) === 15 && Math.abs((num(S.atm.P) ?? 1013.25) - 1013.25) < 0.01;
+  const atmText = () => isStdAtm() ? 'ISO standard atmosphere (15 °C, 1013.25 hPa)' : 'non-standard atmosphere: ' + S.atm.T + ' °C, ' + S.atm.P + ' hPa';
   const isClicks = R => sightDef(R).kind === 'clicks';
   /* Settings as you can set them on this rifle's sight: graduation lines (micrometer sights) or slide stops. */
   function settingList(R) {
@@ -284,6 +287,7 @@
 
   /* ---------------- home ---------------- */
   function renderHome() {
+    const ab = $('atmBox'); if (ab) ab.querySelector('summary').textContent = 'Advanced: non-standard atmosphere' + (isStdAtm() ? '' : ' (in use: ' + S.atm.T + ' °C, ' + S.atm.P + ' hPa)');
     const c = $('rifleCards');
     c.innerHTML = S.rifles.length ? S.rifles.map(R => { const M = model(R.model), A = getAmmo(R.ammoId), last = R.firings.map(f => f.date).filter(Boolean).sort().pop();
       return '<button class="rcard" data-open="' + R.id + '"><h3>' + esc(R.name) + '</h3><div class="meta">' + esc(M.name) + '<br>' + esc(PP.SIGHTS[R.sight] ? PP.SIGHTS[R.sight].name : '') + '<br>' + esc(A.name) + '<br><span class="pill">' + R.firings.length + ' firing' + (R.firings.length === 1 ? '' : 's') + '</span>' + (last ? '<span class="pill">last ' + esc(last) + '</span>' : '') + '</div></button>'; }).join('')
@@ -425,6 +429,7 @@
       else { const taller = f.steps > 0; fh += '<div class="callout">A foresight blade about <b class="num">' + Math.abs(f.dh).toFixed(3) + ' in ' + (taller ? 'taller' : 'shorter') + '</b> (≈ ' + Math.abs(f.steps) + ' size' + (Math.abs(f.steps) > 1 ? 's' : '') + ' ' + (taller ? 'up' : 'down') + ') would make the sight true at ' + f.Z + ' yd' + (curB !== null ? ': about <b class="num">' + (curB + f.steps * f.st).toFixed(3) + ' in</b>' : '') + '. A taller blade lowers the group. After changing it, shoot a confirming group and add it here.</div>'; }
       fh += '<p class="hint">Based on a sight radius of ' + (num(R.sightRadius) || 28) + ' in. The settings tables are for the blade currently fitted.</p>'; }
     $('foresight').innerHTML = fh;
+    const an = 'Calculated for the ' + atmText() + '.' + (isStdAtm() ? '' : ' Change this on the Home tab under Advanced.'); $('atmNote').textContent = an; $('atmNote2').textContent = an;
     // settings table
     $('thBattle').style.display = hasBattle(R) ? '' : 'none'; $('thClicks').style.display = T0 === 'clicks' ? '' : 'none';
     document.querySelector('#settings tbody').innerHTML = r.rows.map(x => { const b = x.best; return '<tr' + (x.trans ? ' class="warnrow" title="Near the speed of sound: less certain"' : '') + '><td class="num" style="text-align:left">' + x.R + '</td><td>' + (b ? '<span class="set">' + lab(b.label) + '</span>' : '–') + '</td>' + (T0 === 'clicks' ? '<td class="num col-x">' + (b ? sgn(b.tot, 0) : '–') + '</td>' : '') + '<td class="num">' + (b ? sgn(b.poi) + ' in <span class="hint">(' + sgn(b.poi / ipm(x.R)) + ' MOA)</span>' : '–') + '</td><td class="num col-x">' + fmtExact(x.exact) + '</td>' + (hasBattle(R) ? '<td class="num">' + sgn(x.battle) + ' in</td>' : '') + '<td class="num">' + x.drift.toFixed(1) + ' in</td><td class="num col-x">' + Math.round(x.vel) + '</td><td class="num col-x">' + x.tof.toFixed(2) + '</td></tr>'; }).join('') || '<tr><td colspan="9">No ranges to show.</td></tr>';
@@ -499,7 +504,7 @@
   /* ---------------- copy / backup ---------------- */
   async function copyText(t, btn) { try { await navigator.clipboard.writeText(t); const o = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = o, 1500); } catch (e) { $('io').value = t; $('io').closest('details').open = true; $('io').select(); $('msg').textContent = 'Couldn’t copy automatically; the text is selected in the backup box on the Home tab.'; } }
   $('copyBtn').addEventListener('click', e => { const r = LAST, R = cur(); if (!r || !R) return; const A = getAmmo(R.ammoId);
-    const lines = ['Sight settings — ' + (R.name || model(R.model).name), A.name + ': ' + A.weight + ' gr, ' + A.mv + ' fps, G1 ' + A.bc + ' | ' + S.atm.T + '°C ' + S.atm.P + ' hPa', ''];
+    const lines = ['Sight settings — ' + (R.name || model(R.model).name), A.name + ': ' + A.weight + ' gr, ' + A.mv + ' fps, G1 ' + A.bc + ' | ' + atmText(), ''];
     lines.push(['Range', 'Set', 'Impact(in)', 'Exact'].concat(hasBattle(R) ? ['Battle(in)'] : []).concat(['Drift10mph(in)']).join('\t'));
     r.rows.forEach(x => lines.push([x.R, x.best ? x.best.label.replace('−', '-') : '-', x.best ? sgn(x.best.poi).replace('−', '-') : '-', fmtExact(x.exact)].concat(hasBattle(R) ? [sgn(x.battle).replace('−', '-')] : []).concat([x.drift.toFixed(1)]).join('\t')));
     copyText(lines.join('\n'), e.target); });
@@ -520,6 +525,8 @@
   $('dlBtn').addEventListener('click', () => { const b = new Blob([JSON.stringify(S, null, 1)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'peep-and-post-' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); });
   $('ulFile').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; f.text().then(t => { try { const o = JSON.parse(t); if (o && o.v === 2) { S = mergeDefaults(o); PP.state = S; save(); show(S.active); $('msg').textContent = 'Backup loaded.'; } else importObj(o); } catch (err) { $('msg').textContent = 'That file isn’t a sight book backup.'; } e.target.value = ''; }); });
 
+  $('atmReset').addEventListener('click', () => { S.atm.T = 15; S.atm.P = 1013.25; fill(); renderHome(); changed(); });
+  ['input', 'change'].forEach(ev => $('atmBox').addEventListener(ev, e => { if (e.target.dataset && /^atm\./.test(e.target.dataset.k || '')) setTimeout(() => { const ab = $('atmBox'); ab.querySelector('summary').textContent = 'Advanced: non-standard atmosphere' + (isStdAtm() ? '' : ' (in use: ' + S.atm.T + ' °C, ' + S.atm.P + ' hPa)'); }, 0); }));
   /* ---------------- start ---------------- */
   status(); show(S.active || 'home');
   try {
