@@ -16,7 +16,7 @@ PP.rng = (a, b, s) => { const o = []; for (let x = a; x <= b; x += s) o.push(x);
 PP.SIGHTS = {
   no4_mk1: {
     name: 'Mk1 (Singer type): micrometer screw, 200–1300 yd',
-    kind: 'clicks', marks: PP.rng(200, 1300, 100), clickTop: 1000, clickCount: 56, clicksBelow: 4, battle: 300,
+    kind: 'clicks', marks: PP.rng(200, 1300, 100), gradStep: 50, clickTop: 1000, clickCount: 56, clicksBelow: 4, battle: 300,
     hint: 'Wound up and down by the knurled screw in clicks of roughly 1 MOA. Count the clicks between the 200 and 1000 marks on your own sight (typically about 56) so the tool knows your click value.'
   },
   no4_mk2: {
@@ -32,7 +32,7 @@ PP.SIGHTS = {
     hint: 'As the Mk3 but with the improved, curved slide catch and larger aperture; no clicks. Set how often the slide stops on yours.'
   },
   no5_mk1: {
-    name: 'No5 Mk1: micrometer screw, 200–800 yd', kind: 'clicks', marks: PP.rng(200, 800, 100), clickTop: 800, clickMOA: 0.66, clicksBelow: 4, battle: 300,
+    name: 'No5 Mk1: micrometer screw, 200–800 yd', kind: 'clicks', marks: PP.rng(200, 800, 100), gradStep: 50, clickTop: 800, clickMOA: 0.66, clicksBelow: 4, battle: 300,
     hint: 'Looks like the No4 Mk1 sight but graduated only to 800 yd, with marks laid out for the carbine’s shorter barrel. Clicks are about 0.66 MOA on the No5. Count the clicks between your 200 and 800 marks.'
   },
   no5_mk2: {

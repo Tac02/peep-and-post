@@ -103,6 +103,25 @@
   function parseGrads(s) { const out = []; String(s || '').split(/[,;\s]+/).forEach(tok => { if (!tok) return; const m = tok.match(/^(\d+)-(\d+)(?:\/(\d+))?$/); if (m) { let a = +m[1], b = +m[2], st = +(m[3] || 100); if (st <= 0) st = 100; for (let x = a; x <= b + 1e-9 && out.length < 500; x += st) out.push(x); } else if (isFinite(+tok) && tok !== '') out.push(+tok); }); return [...new Set(out)].filter(x => x >= 100 && x <= 2500).sort((a, b) => a - b); }
   function gradsOf(R) { const sd = sightDef(R); if (sd.kind === 'fixed') return sd.grads.slice(); if (sd.kind === 'steps') return PP.rng(sd.min, sd.max, Math.max(25, num(R.notchStep) || sd.step)); if (sd.kind === 'custom') return parseGrads(R.grads); return []; }
   const isClicks = R => sightDef(R).kind === 'clicks';
+  /* Settings as you can set them on this rifle's sight: graduation lines (micrometer sights) or slide stops. */
+  function settingList(R) {
+    const sd = sightDef(R);
+    let g = sd.kind === 'clicks' ? PP.rng(sd.marks[0], sd.marks[sd.marks.length - 1], sd.gradStep || 100) : gradsOf(R);
+    const out = g.map(v => ({ v: String(v), l: String(v) + (sd.kind === 'clicks' && v % 100 ? ' (half mark)' : '') }));
+    if (hasBattle(R)) out.unshift({ v: 'B', l: 'B: battle aperture (' + (num(R.battleRange) || 300) + ' yd)' });
+    return out;
+  }
+  function fillTrjSet(R) {
+    const sel = $('trjSet'); if (!sel || !R) return;
+    const list = settingList(R), curV = String(R.trj.set ?? '').trim().toUpperCase();
+    if (!list.some(o => o.v === curV)) {
+      // keep the old choice if it no longer matches a graduation: pick the nearest one
+      const n = parseFloat(curV), nums = list.filter(o => o.v !== 'B');
+      R.trj.set = curV === 'B' && list[0] && list[0].v === 'B' ? 'B' : (nums.length ? (isFinite(n) ? nums.reduce((a, b) => Math.abs(+b.v - n) < Math.abs(+a.v - n) ? b : a).v : (nums.find(o => o.v === '300') || nums[0]).v) : '');
+    }
+    sel.innerHTML = list.map(o => '<option value="' + o.v + '">' + esc(o.l) + '</option>').join('');
+    sel.value = R.trj.set;
+  }
   const hasBattle = R => sightDef(R).battle != null && !!R.battle;
   function parseSetting(v) { const t = String(v ?? '').trim().toUpperCase().replace(/\s+/g, '').replace('−', '-'); if (!t) return null; if (t === 'B' || t === 'BATTLE') return { battle: true }; const m = t.match(/^(\d+(?:\.\d+)?)(?:([+-])(\d+(?:\.\d+)?)(?:C|CL|CLICKS?)?)?$/); if (!m) return null; return { mark: +m[1], clicks: m[2] ? (m[2] === '-' ? -1 : 1) * +m[3] : 0 }; }
   const unitIn = (u, R) => u === 'moa' ? 1 : u === 'zr' ? ipm(PP.ZRYD) : ipm(R);
@@ -198,6 +217,7 @@
     if (R) {
       $('modelSel').innerHTML = PP.RIFLES.map(m => '<option value="' + m.id + '">' + esc(m.name) + '</option>').join('');
       $('sightSel').innerHTML = model(R.model).sights.map(id => '<option value="' + id + '">' + esc(PP.SIGHTS[id].name) + '</option>').join('');
+      fillTrjSet(R);
     }
     document.querySelectorAll('[data-k]').forEach(el => { if (el.dataset.k.startsWith('R.') && !R) return; const v = getP(el.dataset.k); if (el.type === 'checkbox') el.checked = !!v; else el.value = v ?? ''; });
     if (R) syncSight();
@@ -226,6 +246,7 @@
     if (k === 'R.model' && R) { const M = model(v); if (!M.sights.includes(R.sight)) R.sight = M.sights[0]; R.sightRadius = M.radius; R.bladeStep = M.bladeStep; const ref = clone(PP.REF[M.ref] || PP.REF.mk7); delete ref.name; R.ref = ref; onSightChange(R); fill(); }
     else if (k === 'R.sight' && R) { onSightChange(R); fill(); }
     else if (k === 'R.ammoId' || k.startsWith('R.ref')) syncSight();
+    if (R && (k === 'R.notchStep' || k === 'R.grads' || k === 'R.battle' || k === 'R.battleRange')) fillTrjSet(R);
     if (k === 'R.name') renderTabs();
     changed();
   }
