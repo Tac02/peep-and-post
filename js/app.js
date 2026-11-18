@@ -111,6 +111,17 @@
     if (hasBattle(R)) out.unshift({ v: 'B', l: 'B: battle aperture (' + (num(R.battleRange) || 300) + ' yd)' });
     return out;
   }
+  function firingSetOptions(R, f) {
+    const list = settingList(R), ps = parseSetting(f.setting);
+    // older entries like "500+2": move the clicks into the Clicks box
+    if (ps && !ps.battle && ps.clicks && isClicks(R)) { f.setting = String(ps.mark); f.clk = (num(f.clk) || 0) + ps.clicks; }
+    const v = ps ? (ps.battle ? 'B' : String(ps.mark)) : String(f.setting ?? '');
+    if (ps && !ps.battle && !ps.clicks) f.setting = v;
+    let opts = list.slice();
+    if (v && !opts.some(o => o.v === v)) opts.push({ v, l: v + (v === 'B' ? ': battle aperture' : '') + ' (not on this sight)' });
+    if (!v) opts.unshift({ v: '', l: 'Choose…' });
+    return opts.map(o => '<option value="' + esc(o.v) + '"' + (o.v === v ? ' selected' : '') + '>' + esc(o.l) + '</option>').join('');
+  }
   function fillTrjSet(R) {
     const sel = $('trjSet'); if (!sel || !R) return;
     const list = settingList(R), curV = String(R.trj.set ?? '').trim().toUpperCase();
@@ -246,7 +257,7 @@
     if (k === 'R.model' && R) { const M = model(v); if (!M.sights.includes(R.sight)) R.sight = M.sights[0]; R.sightRadius = M.radius; R.bladeStep = M.bladeStep; const ref = clone(PP.REF[M.ref] || PP.REF.mk7); delete ref.name; R.ref = ref; onSightChange(R); fill(); }
     else if (k === 'R.sight' && R) { onSightChange(R); fill(); }
     else if (k === 'R.ammoId' || k.startsWith('R.ref')) syncSight();
-    if (R && (k === 'R.notchStep' || k === 'R.grads' || k === 'R.battle' || k === 'R.battleRange')) fillTrjSet(R);
+    if (R && (k === 'R.notchStep' || k === 'R.grads' || k === 'R.battle' || k === 'R.battleRange' || k === 'R.sight' || k === 'R.model')) { fillTrjSet(R); renderFirings(); }
     if (k === 'R.name') renderTabs();
     changed();
   }
@@ -327,7 +338,7 @@
       td('c-use', 'Use', '<label class="check" style="font-size:13px"><input type="checkbox" data-i="' + i + '" data-f="inc"' + (f.inc ? ' checked' : '') + '><span class="ph">Use this group</span></label>') +
       td('c-date', 'Date', inp(f, i, 'date', 'w-d', 'date')) +
       td('c-range', 'Range (yd)', inp(f, i, 'range', 'w-s', 'number', '25', ' inputmode="numeric"')) +
-      td('c-set', 'Sight set', inp(f, i, 'setting', 'w-s', 'text', '', ' placeholder="300 or B" autocapitalize="characters"')) +
+      td('c-set', 'Sight set', '<select class="w-set" data-i="' + i + '" data-f="setting">' + firingSetOptions(R, f) + '</select>') +
       td('c-clk', 'Clicks ±', clicks ? '<div class="pmw">' + inp(f, i, 'clk', 'w-s', 'number', '1', ' placeholder="0"') + pm(i, 'clk') + '</div>' : '<span class="hint">n/a</span>') +
       td('c-shots', 'Shots', inp(f, i, 'shots', 'w-s', 'number', '1', ' min="1" inputmode="numeric"')) +
       td('c-unit', 'Units', '<select data-i="' + i + '" data-f="unit">' + [['in', 'in'], ['moa', 'MOA'], ['zr', 'ZR card in']].map(o => '<option value="' + o[0] + '"' + ((f.unit || 'in') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>') +
@@ -339,6 +350,7 @@
       td('c-notes', 'Notes', inp(f, i, 'notes', '', 'text', '', ' placeholder="Light, wind, position…"')) +
       '<td class="num c-res" data-label="Model / residual" id="res-' + esc(f.id) + '">–</td>' +
       '<td class="c-del"><button class="x" data-del="' + i + '" title="Delete this firing">×</button></td></tr>').join('');
+    save();
   }
   const ftable = $('firings');
   function onFiring(e) { const el = e.target, i = +el.dataset.i, k = el.dataset.f, R = cur(); if (!R || isNaN(i) || !k || !R.firings[i]) return; if ((el.tagName === 'SELECT' || el.type === 'checkbox') && e.type === 'input') return;
@@ -358,7 +370,7 @@
   });
   $('addBtn').addEventListener('click', () => {
     const R = cur(); if (!R) return; const last = R.firings[R.firings.length - 1];
-    R.firings.push({ id: uid(), inc: true, date: last ? last.date : new Date().toISOString().slice(0, 10), range: last ? last.range : 300, setting: last ? last.setting : '300', clk: null, aim: last ? last.aim || 'poi' : 'poi', tgt: last ? last.tgt || 'f11' : 'f11', shots: last ? last.shots : 5, unit: last ? last.unit || 'in' : 'in', dy: null, dx: null, group: null, notes: '' });
+    R.firings.push({ id: uid(), inc: true, date: last ? last.date : new Date().toISOString().slice(0, 10), range: last ? last.range : 300, setting: last ? last.setting : (settingList(R).some(o => o.v === '300') ? '300' : (settingList(R).find(o => o.v !== 'B') || { v: '' }).v), clk: null, aim: last ? last.aim || 'poi' : 'poi', tgt: last ? last.tgt || 'f11' : 'f11', shots: last ? last.shots : 5, unit: last ? last.unit || 'in' : 'in', dy: null, dx: null, group: null, notes: '' });
     renderFirings(); changed();
     const rows = document.querySelectorAll('#firings tbody tr'), rr = rows[rows.length - 1], inp = rr && rr.querySelector('[data-f="dy"]');
     if (inp) { if (rr.scrollIntoView) rr.scrollIntoView({ block: 'center' }); inp.focus({ preventScroll: true }); }
