@@ -115,7 +115,7 @@
           <label class="check opt-battle"><input data-k="R.battle" type="checkbox"> Battle aperture (leaf down)</label>
           <label class="opt-battle">Battle aperture nominal range (yd)<input data-k="R.battleRange" type="number" step="50"></label>
           <p class="hint full" id="sightHint"></p>
-          <label>Current foresight blade (in)<input data-k="R.blade" type="number" step="0.005" placeholder="e.g. 0.045"></label>
+          <label>Foresight blade fitted now (in)<input data-k="R.blade" type="number" step="0.005" placeholder="e.g. 0.045"></label>
           <label>Foresight blade size step (in)<input data-k="R.bladeStep" type="number" step="0.005"></label>
           <label>Sight height above bore (in)<input data-k="R.sightHeight" type="number" step="0.05"></label>
           <label>Sight radius (in)<input data-k="R.sightRadius" type="number" step="0.25"></label>
@@ -152,8 +152,9 @@
     <section class="card">
       <div class="bar" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Test firings</h2><button id="addBtn">+ Add firing</button></div>
       <div class="scroll"><table id="firings"><thead><tr>
-        <th>Use</th><th>Date</th><th>Range (yd)</th><th>Sight set</th><th title="Clicks up (+) or down (−) from the mark">Clicks ±</th><th>Shots</th><th title="Units for up/down, left/right and group size">Units</th><th title="Where you aimed">Aim</th><th title="Target used for a lollipop hold">Target</th><th title="Height of group centre above where you wanted it. High is positive (+), low is negative (−).">Up (+) / Down (−)</th><th title="As seen from the firing point. Right is positive (+), left is negative (−).">Right (+) / Left (−)</th><th>Group size</th><th>Notes</th><th class="num">Model / residual</th><th></th></tr></thead><tbody></tbody></table></div>
+        <th>Use</th><th>Date</th><th>Range (yd)</th><th>Sight set</th><th title="Clicks up (+) or down (−) from the mark">Clicks ±</th><th>Shots</th><th title="Foresight blade fitted when this group was shot">Blade (in)</th><th title="Units for up/down, left/right and group size">Units</th><th title="Where you aimed">Aim</th><th title="Target used for a lollipop hold">Target</th><th title="Height of group centre above where you wanted it. High is positive (+), low is negative (−).">Up (+) / Down (−)</th><th title="As seen from the firing point. Right is positive (+), left is negative (−).">Right (+) / Left (−)</th><th>Group size</th><th>Notes</th><th class="num">Model / residual</th><th></th></tr></thead><tbody></tbody></table></div>
       <p class="hint">For each group, enter where its centre landed relative to where you <i>wanted</i> it. <b>Up/down:</b> <b>+</b> is high, <b>−</b> is low. <b>Left/right</b> (as you look at the target from the firing point): <b>+</b> is right, <b>−</b> is left. The ± buttons flip a number between the two, and the line under each box spells out which way it is. Or tap <b>Plot shots</b> and mark each hole on a picture of the target; the tool fills in the centre, size and shot count. In <i>Sight set</i>, pick the setting from your rear sight's own graduations (or <i>B</i> for the battle aperture), and put any micrometer clicks above or below it in <i>Clicks ±</i>. Untick <i>Use</i> to leave out a flyer or a bad day.</p>
+      <p class="hint"><b>Blade:</b> the foresight blade fitted when the group was shot. It fills in with the blade fitted now. When you change your blade, update <i>Foresight blade fitted now</i> on the Rifle &amp; load or Sight settings tab: older groups keep the blade they were shot with, and the settings are worked out for the new one.</p>
       <p class="hint"><b>Aim:</b> <i>Point of impact</i> means you aimed at the spot you wanted to hit. <i>Lollipop</i> means you held the bottom of the chosen target (or of the round bull's black aiming mark) on top of the foresight. Either way, measure from the middle of the scoring circles; the tool allows for the hold-off.</p>
       <p class="hint"><b>Units</b> apply to up/down, left/right and group size: <i>in</i> = inches at that range; <i>MOA</i>; <i>ZR card in</i> = inches on the Bisley Zero Range card (fired at 71′ 7″, where ¼ in ≈ 1 MOA). For Zero Range groups, put the card mark you aimed at (e.g. 300) as the range.</p>
     </section>
@@ -173,6 +174,8 @@
       <p class="hint phone-note" style="display:none">On a micrometer sight, <b>+2</b> / <b>−1</b> after a mark means clicks up or down from it.</p>
       <div class="scroll"><table id="settings"><thead><tr>
         <th>Range (yd)</th><th>Set sight to</th><th class="num col-x" id="thClicks">Clicks from 200</th><th class="num">Expected impact</th><th class="num col-x">Exact setting</th><th class="num" id="thBattle">Battle aperture impact</th><th class="num">10 mph crosswind drift</th><th class="num col-x">Velocity (fps)</th><th class="num col-x">Time of flight (s)</th></tr></thead><tbody></tbody></table></div>
+      <div class="fields" style="max-width:520px;margin-bottom:6px"><label>Foresight blade fitted now (in)<input data-k="R.blade" type="number" step="0.015" placeholder="e.g. 0.045"></label></div>
+      <p class="hint" id="bladeNote"></p>
       <p class="hint" id="atmNote2"></p>
       <p class="hint">Expected impact is where the group centre should land relative to point of aim at that setting (+ high). "Exact setting" is where to set the slide if you could set it anywhere. Wind drift is for a full-value (right-angle) wind; aim off into the wind. Rows in orange are near the speed of sound and less certain.</p>
       <div id="chart"></div>

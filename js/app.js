@@ -39,7 +39,7 @@
     const s = clone(DEFAULTS);
     if (o && typeof o === 'object') for (const k in o) { if (s[k] && typeof s[k] === 'object' && !Array.isArray(s[k]) && o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) Object.assign(s[k], o[k]); else s[k] = o[k]; }
     if (!Array.isArray(s.rifles)) s.rifles = []; if (!Array.isArray(s.ammo)) s.ammo = [];
-    s.rifles = s.rifles.map(R => { const base = newRifle(R.model, R.sight, R.name, R.ammoId); const out = Object.assign(base, R); ['ref', 'fit', 'table', 'trj'].forEach(k => out[k] = Object.assign(base[k] || {}, R[k] || {})); out.firings = (R.firings || []).map(f => Object.assign({ id: uid(), inc: true, unit: 'in', aim: 'poi', tgt: 'f11' }, f)); return out; });
+    s.rifles = s.rifles.map(R => { const base = newRifle(R.model, R.sight, R.name, R.ammoId); const out = Object.assign(base, R); ['ref', 'fit', 'table', 'trj'].forEach(k => out[k] = Object.assign(base[k] || {}, R[k] || {})); out.firings = (R.firings || []).map(f => Object.assign({ id: uid(), inc: true, unit: 'in', aim: 'poi', tgt: 'f11', blade: out.blade ?? null }, f)); return out; });
     return s;
   }
   /* Older single-rifle No4 Sight Book data -> one rifle profile (+ a custom load if needed). */
@@ -54,7 +54,7 @@
     ['clickCount', 'clicksBelow', 'notchStep', 'grads', 'battle', 'battleRange', 'sightHeight', 'sightRadius', 'blade', 'bladeStep', 'zeroRange', 'notes'].forEach(k => { if (r1[k] !== undefined) R[k] = r1[k]; });
     if (o.ref) Object.assign(R.ref, o.ref); if (o.fit) Object.assign(R.fit, o.fit); if (o.table) Object.assign(R.table, o.table);
     if (o.trj) { Object.assign(R.trj, o.trj); ['a', 'b'].forEach(k => { const v = R.trj[k]; if (v && v !== 'current' && !/^[pc]:/.test(v)) R.trj[k] = 'p:' + v; }); }
-    R.firings = (o.firings || []).map(f => Object.assign({ id: uid(), inc: true, unit: 'in', aim: 'poi', tgt: 'f11' }, f));
+    R.firings = (o.firings || []).map(f => Object.assign({ id: uid(), inc: true, unit: 'in', aim: 'poi', tgt: 'f11', blade: R.blade ?? null }, f));
     out.rifle = R; out.lolli = o.lolli; out.atm = o.atm;
     return out;
   }
@@ -159,17 +159,20 @@
     const invNom = t => { if (!(t >= nomArr[100])) { const sl = (nomArr[150] - nomArr[100]) / 50; const x = 100 + (t - nomArr[100]) / sl; return (isFinite(x) && x >= 50) ? x : -1; } if (t > nomArr[2500] || isNaN(nomArr[2500])) return Infinity; let lo = 100, hi = 2500; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (nomArr[m] < t) lo = m; else hi = m; } return lo + (t - nomArr[lo]) / (nomArr[hi] - nomArr[lo]); };
     const top = sd.clickTop || 1000;
     const U = T === 'clicks' ? (nomAt(top) - nomAt(200)) / Math.max(10, num(R.clickCount) || 56) : 0;
-    const holds = lolliTargets(), skipped = {}, pts = [], bpts = [];
+    // Foresight blades: a taller blade lowers the bore relative to the line of sight by height / sight radius.
+    const rad = num(R.sightRadius) || 28, curB = num(R.blade), bladeOf = f => num(f.blade) ?? curB ?? 0, corrOf = f => (bladeOf(f) - (curB ?? 0)) / rad * MOA;
+    const holds = lolliTargets(), skipped = {}, pts = [], bpts = [], blades = {};
     R.firings.forEach(f => {
       const Rr = num(f.range), dy = num(f.dy); if (!f.inc || !Rr || dy === null) return;
       let nd = need(Rr); if (isNaN(nd)) return;
       let holdM = 0; if (f.aim === 'lolli') { const t = holds.find(x => x.key === (f.tgt || 'f11')); const hh = t && t.holdAt(Rr); if (!hh) { skipped[f.id] = 'No ' + (t ? t.name : 'target') + ' face for ' + Rr + ' yd'; return; } holdM = hh / ipm(Rr); }
       const need0 = nd; nd = need0 + holdM;
-      const uf = unitIn(f.unit, Rr), dyM = dy / uf, w = Math.max(0.1, num(f.shots) || 1), act = nd + dyM, ps = parseSetting(f.setting); if (!ps) return;
-      if (ps.battle) { bpts.push({ f, R: Rr, w, need: nd, need0, holdM, act, dyM, uf }); return; }
+      const corr = corrOf(f), uf = unitIn(f.unit, Rr), dyM = dy / uf, w = Math.max(0.1, num(f.shots) || 1), act = nd + dyM + corr, ps = parseSetting(f.setting); if (!ps) return;
+      const bk = num(f.blade) ?? curB; blades[bk === null ? '?' : bk.toFixed(3)] = (blades[bk === null ? '?' : bk.toFixed(3)] || 0) + 1;
+      if (ps.battle) { bpts.push({ f, R: Rr, w, need: nd, need0, holdM, act, dyM, uf, corr }); return; }
       const clk = T === 'clicks' ? ps.clicks + (num(f.clk) || 0) : 0;
       const x0 = nomAt(ps.mark); if (isNaN(x0)) return; const x = x0 + clk * U;
-      pts.push({ f, R: Rr, w, need: nd, need0, holdM, act, x, s: ps.mark, dyM, uf });
+      pts.push({ f, R: Rr, w, need: nd, need0, holdM, act, x, s: ps.mark, dyM, uf, corr });
     });
     let a = 0, b = 1, mode = 'none', note = '';
     const used = [...new Set(pts.map(p => p.s))], span = used.length ? Math.max(...used) - Math.min(...used) : 0;
@@ -186,8 +189,8 @@
     if (bpts.length) { let sw = 0, s = 0; bpts.forEach(p => { sw += p.w; s += p.w * p.act; }); battleAngle = s / sw; battleFrom = 'measured'; if (!pts.length) { a = battleAngle - nomAt(bR); b = 1; mode = 'battle'; } }
     else { battleAngle = a + b * nomAt(bR); battleFrom = 'assumed'; }
     let rw = 0, rs = 0;
-    pts.forEach(p => { const pm = a + b * p.x - p.need, rm = p.dyM - pm; p.pred = pm * p.uf; p.res = rm * p.uf; rw += p.w; rs += p.w * rm * rm; });
-    bpts.forEach(p => { const pm = battleAngle - p.need, rm = p.dyM - pm; p.pred = pm * p.uf; p.res = rm * p.uf; if (bpts.length > 1 || pts.length) { rw += p.w; rs += p.w * rm * rm; } });
+    pts.forEach(p => { const pm = a + b * p.x - p.corr - p.need, rm = p.dyM - pm; p.pred = pm * p.uf; p.res = rm * p.uf; rw += p.w; rs += p.w * rm * rm; });
+    bpts.forEach(p => { const pm = battleAngle - p.corr - p.need, rm = p.dyM - pm; p.pred = pm * p.uf; p.res = rm * p.uf; if (bpts.length > 1 || pts.length) { rw += p.w; rs += p.w * rm * rm; } });
     const rms = rw ? Math.sqrt(rs / rw) : null;
     // setting chooser
     const grads = gradsOf(R), marks = sd.marks || [], below = Math.max(0, num(R.clicksBelow) ?? 4), c200 = nomAt(200), maxClicks = U ? Math.round((nomAt(marks[marks.length - 1] || top) - c200) / U) : 0;
@@ -213,7 +216,7 @@
     if (pts.length || bpts.length) { const nz = need(Z), useB = !pts.length, giv = useB ? battleAngle : a + b * nomAt(Z); if (!isNaN(nz) && !isNaN(giv)) { const E = giv - nz, rad = num(R.sightRadius) || 28, dh = E / MOA * rad, stp = num(R.bladeStep) || 0.015; fs = { Z, E, poi: E * ipm(Z), dh, steps: Math.round(dh / stp), st: stp, useB }; } }
     const implied = pts.map(p => ({ R: p.R, s: invNom(p.x + (p.need0 - (p.act - p.holdM)) / b) })).filter(p => isFinite(p.s) && p.s > 0);
     const grp = R.firings.filter(f => f.inc && num(f.group) && num(f.range)).map(f => num(f.group) / unitIn(f.unit, num(f.range)));
-    return { R, ammo, skipped, nomAt, U, a, b, mode, note, pts, bpts, battleAngle, battleFrom, bR, rms, rows, holds, fs, implied, usr, h, grpMOA: grp.length ? grp.reduce((x, y) => x + y, 0) / grp.length : null, nGrp: grp.length, maxR: Math.max(0, ...pts.map(p => p.R), ...bpts.map(p => p.R)) };
+    return { blades, curB, rad, R, ammo, skipped, nomAt, U, a, b, mode, note, pts, bpts, battleAngle, battleFrom, bR, rms, rows, holds, fs, implied, usr, h, grpMOA: grp.length ? grp.reduce((x, y) => x + y, 0) / grp.length : null, nGrp: grp.length, maxR: Math.max(0, ...pts.map(p => p.R), ...bpts.map(p => p.R)) };
   }
 
   /* ---------------- formatting ---------------- */
@@ -256,7 +259,10 @@
     if (el.type === 'checkbox' && e.type === 'input') return;
     if (el.tagName !== 'SELECT' && el.type !== 'checkbox' && e.type === 'change') return;
     const v = el.type === 'checkbox' ? el.checked : (el.type === 'number' ? num(el.value) : el.value);
-    const k = el.dataset.k, R = cur(); setP(k, v);
+    const k = el.dataset.k, R = cur();
+    if (k === 'R.blade' && R) { const old = num(R.blade); R.firings.forEach(f => { if (num(f.blade) === null) f.blade = old ?? v; }); }
+    setP(k, v);
+    if (k === 'R.blade' && R) { document.querySelectorAll('[data-k="R.blade"]').forEach(x => { if (x !== el) x.value = v ?? ''; }); renderFirings(); }
     if (k === 'R.model' && R) { const M = model(v); if (!M.sights.includes(R.sight)) R.sight = M.sights[0]; R.sightRadius = M.radius; R.bladeStep = M.bladeStep; const ref = clone(PP.REF[M.ref] || PP.REF.mk7); delete ref.name; R.ref = ref; onSightChange(R); fill(); }
     else if (k === 'R.sight' && R) { onSightChange(R); fill(); }
     else if (k === 'R.ammoId' || k.startsWith('R.ref')) syncSight();
@@ -333,7 +339,7 @@
   /* ---------------- firings ---------------- */
   function renderFirings() {
     const R = cur(), tb = document.querySelector('#firings tbody'); if (!R) return;
-    if (!R.firings.length) { tb.innerHTML = '<tr><td colspan="15" class="hint" style="padding:10px 6px">No firings yet. Add your first group.</td></tr>'; return; }
+    if (!R.firings.length) { tb.innerHTML = '<tr><td colspan="16" class="hint" style="padding:10px 6px">No firings yet. Add your first group.</td></tr>'; return; }
     const clicks = isClicks(R), holds = lolliTargets();
     const inp = (f, i, k, cls, type, step, extra) => '<input class="' + cls + '" type="' + type + '"' + (step ? ' step="' + step + '"' : '') + ' data-i="' + i + '" data-f="' + k + '" value="' + esc(f[k]) + '"' + (extra || '') + '>';
     const pm = (i, k) => { const t = k === 'dx' ? 'Switch between right (+) and left (−)' : k === 'dy' ? 'Switch between up (+) and down (−)' : 'Switch between clicks up (+) and down (−)'; return '<button type="button" class="pm" data-pm="' + k + '" data-i="' + i + '" title="' + t + '" aria-label="' + t + '">±</button>'; };
@@ -345,6 +351,7 @@
       td('c-set', 'Sight set', '<select class="w-set" data-i="' + i + '" data-f="setting">' + firingSetOptions(R, f) + '</select>') +
       td('c-clk', 'Clicks ±', clicks ? '<div class="pmw">' + inp(f, i, 'clk', 'w-s', 'number', '1', ' placeholder="0"') + pm(i, 'clk') + '</div>' : '<span class="hint">n/a</span>') +
       td('c-shots', 'Shots', inp(f, i, 'shots', 'w-s', 'number', '1', ' min="1" inputmode="numeric"')) +
+      td('c-blade', 'Foresight blade (in)', inp(f, i, 'blade', 'w-s', 'number', String(num(R.bladeStep) || 0.015), ' placeholder="' + (num(R.blade) ?? '') + '" title="Foresight blade fitted when this group was shot"') + (num(f.blade) !== null && num(R.blade) !== null && Math.abs(num(f.blade) - num(R.blade)) > 1e-6 ? '<div class="hint dirh">not the blade fitted now</div>' : '')) +
       td('c-unit', 'Units', '<select data-i="' + i + '" data-f="unit">' + [['in', 'in'], ['moa', 'MOA'], ['zr', 'ZR card in']].map(o => '<option value="' + o[0] + '"' + ((f.unit || 'in') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>') +
       td('c-aim', 'Aim', '<select data-i="' + i + '" data-f="aim">' + [['poi', 'Point of impact'], ['lolli', 'Lollipop (6 o\'clock)']].map(o => '<option value="' + o[0] + '"' + ((f.aim || 'poi') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>') +
       td('c-tgt', 'Target', '<select data-i="' + i + '" data-id="' + esc(f.id) + '" data-f="tgt"' + (f.aim === 'lolli' ? '' : ' disabled') + '>' + holds.map(t => '<option value="' + t.key + '"' + ((f.tgt || 'f11') === t.key ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') + '</select>') +
@@ -374,7 +381,7 @@
   });
   $('addBtn').addEventListener('click', () => {
     const R = cur(); if (!R) return; const last = R.firings[R.firings.length - 1];
-    R.firings.push({ id: uid(), inc: true, date: last ? last.date : new Date().toISOString().slice(0, 10), range: last ? last.range : 300, setting: last ? last.setting : (settingList(R).some(o => o.v === '300') ? '300' : (settingList(R).find(o => o.v !== 'B') || { v: '' }).v), clk: null, aim: last ? last.aim || 'poi' : 'poi', tgt: last ? last.tgt || 'f11' : 'f11', shots: last ? last.shots : 5, unit: last ? last.unit || 'in' : 'in', dy: null, dx: null, group: null, notes: '' });
+    R.firings.push({ id: uid(), inc: true, date: last ? last.date : new Date().toISOString().slice(0, 10), range: last ? last.range : 300, setting: last ? last.setting : (settingList(R).some(o => o.v === '300') ? '300' : (settingList(R).find(o => o.v !== 'B') || { v: '' }).v), clk: null, aim: last ? last.aim || 'poi' : 'poi', tgt: last ? last.tgt || 'f11' : 'f11', shots: last ? last.shots : 5, unit: last ? last.unit || 'in' : 'in', blade: num(R.blade), dy: null, dx: null, group: null, notes: '' });
     renderFirings(); changed();
     const rows = document.querySelectorAll('#firings tbody tr'), rr = rows[rows.length - 1], inp = rr && rr.querySelector('[data-f="dy"]');
     if (inp) { if (rr.scrollIntoView) rr.scrollIntoView({ block: 'center' }); inp.focus({ preventScroll: true }); }
@@ -413,6 +420,7 @@
       h += '<div>Scale factor</div><div><span class="num">' + r.b.toFixed(3) + '</span> ' + (r.mode === 'scale' ? '(fitted)' : '(fixed at 1, needs groups at 2+ settings 200 yd apart)') + '</div>';
       if (T0 === 'clicks') h += '<div>Click value</div><div><span class="num">' + (r.U * r.b).toFixed(2) + '</span> MOA ≈ ' + (r.U * r.b * 1.047).toFixed(2) + ' in at 100 yd</div>';
       if (hasBattle(R)) h += '<div>Battle aperture</div><div>' + (r.battleFrom === 'measured' ? 'measured from your groups' : 'assumed to match the ' + r.bR + ' mark') + '</div>';
+      const bl = Object.entries(r.blades); if (bl.length) h += '<div>Foresight blades</div><div>' + bl.map(([k, n]) => (k === '?' ? 'not recorded' : k + ' in') + ' (' + n + ' group' + (n > 1 ? 's' : '') + ')').join(', ') + (bl.length > 1 || (bl[0] && bl[0][0] !== '?' && r.curB !== null && Math.abs(+bl[0][0] - r.curB) > 1e-6) ? '. Groups shot with a different blade are corrected to the ' + (r.curB === null ? 'blade fitted now' : r.curB.toFixed(3) + ' in blade fitted now') + '.' : '') + '</div>';
       if (r.grpMOA !== null) h += '<div>Average group</div><div><span class="num">' + r.grpMOA.toFixed(1) + '</span> MOA (' + r.nGrp + ' group' + (r.nGrp > 1 ? 's' : '') + ')</div>';
       if (r.rms !== null) h += '<div>Fit residual (RMS)</div><div><span class="num">' + r.rms.toFixed(2) + '</span> MOA' + (r.rms < 1 ? ' (good)' : r.rms < 2 ? ' (fair)' : ' (poor, check for flyers or typos)') + '</div>';
       h += '</div>';
@@ -430,6 +438,9 @@
       fh += '<p class="hint">Based on a sight radius of ' + (num(R.sightRadius) || 28) + ' in. The settings tables are for the blade currently fitted.</p>'; }
     $('foresight').innerHTML = fh;
     const an = 'Calculated for the ' + atmText() + '.' + (isStdAtm() ? '' : ' Change this on the Home tab under Advanced.'); $('atmNote').textContent = an; $('atmNote2').textContent = an;
+    { const other = Object.keys(r.blades).filter(k => k !== '?' && r.curB !== null && Math.abs(+k - r.curB) > 1e-6); let t = 'Settings are for a ' + (r.curB === null ? 'foresight blade you haven\'t entered yet' : r.curB.toFixed(3) + ' in foresight blade') + '.';
+      if (other.length && r.curB !== null) { const d = (r.curB - Math.max(...other.map(Number))) / r.rad * MOA; t += ' Your test groups were shot with ' + other.map(k => k + ' in').join(' and ') + (Object.keys(r.blades).length > other.length ? ' as well' : '') + '; the tool has allowed for the change (a ' + Math.abs(d).toFixed(1) + ' MOA ' + (d > 0 ? 'lower' : 'higher') + ' impact, about ' + Math.abs(d * 1.047).toFixed(1) + ' in at 100 yd). Confirm on paper when you can.'; }
+      $('bladeNote').textContent = t; }
     // settings table
     $('thBattle').style.display = hasBattle(R) ? '' : 'none'; $('thClicks').style.display = T0 === 'clicks' ? '' : 'none';
     document.querySelector('#settings tbody').innerHTML = r.rows.map(x => { const b = x.best; return '<tr' + (x.trans ? ' class="warnrow" title="Near the speed of sound: less certain"' : '') + '><td class="num" style="text-align:left">' + x.R + '</td><td>' + (b ? '<span class="set">' + lab(b.label) + '</span>' : '–') + '</td>' + (T0 === 'clicks' ? '<td class="num col-x">' + (b ? sgn(b.tot, 0) : '–') + '</td>' : '') + '<td class="num">' + (b ? sgn(b.poi) + ' in <span class="hint">(' + sgn(b.poi / ipm(x.R)) + ' MOA)</span>' : '–') + '</td><td class="num col-x">' + fmtExact(x.exact) + '</td>' + (hasBattle(R) ? '<td class="num">' + sgn(x.battle) + ' in</td>' : '') + '<td class="num">' + x.drift.toFixed(1) + ' in</td><td class="num col-x">' + Math.round(x.vel) + '</td><td class="num col-x">' + x.tof.toFixed(2) + '</td></tr>'; }).join('') || '<tr><td colspan="9">No ranges to show.</td></tr>';
