@@ -53,7 +53,8 @@ The trajectory model is a point-mass G1 solver. Each sight mark is modelled as t
 
 1. Edit the files above. New rifles and sights go in `js/data.js`.
 2. In `sw.js`, bump `VERSION` (e.g. `pp-v1` → `pp-v2`) so installed copies pick up the change.
-3. Commit to `main`. GitHub Pages republishes within a minute or two.
+3. Run `python3 tests/test_blade.py` (needs Playwright) to check the foresight blade maths.
+4. Commit to `main`. GitHub Pages republishes within a minute or two.
 
 See [ROADMAP.md](ROADMAP.md) for planned rifles, calibres and features.
 
